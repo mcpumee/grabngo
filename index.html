@@ -296,6 +296,24 @@
       <div id="step-2" class="hide">
         <div class="step-label" data-i18n="step2Label">STEP 2 — CHOOSE YOUR LOCKER</div>
         <h2 class="step-title" data-i18n="step2Title">Size &amp; Storage Mode</h2>
+
+        <div class="field">
+          <label data-i18n="lblDelivery">How will the item reach us?</label>
+          <div class="temp-grid" style="grid-template-columns:1fr 1fr;">
+            <div class="temp-opt selected" data-delivery="self" onclick="selectDelivery('self')"><strong data-i18n="deliverySelf">I'll drop it off myself</strong><div class="r" data-i18n="deliverySelfNote">Free</div></div>
+            <div class="temp-opt" data-delivery="full_service" onclick="selectDelivery('full_service')"><strong data-i18n="deliveryFull">Full Service — we pick it up</strong><div class="r" id="fs-rate-preview">From ฿100</div></div>
+          </div>
+        </div>
+        <div id="fullServiceFields" class="hide">
+          <div class="field"><label data-i18n="lblStoreName">Store name</label><input type="text" id="pickupStoreName" data-i18n-ph="phStoreName" placeholder="e.g. ABC Electronics"></div>
+          <div class="field"><label data-i18n="lblStoreAddress">Store address</label><input type="text" id="pickupStoreAddress" data-i18n-ph="phStoreAddress" placeholder="Address or map link"></div>
+          <div class="field"><label data-i18n="lblEstWeight">Estimated weight (kg)</label><input type="number" id="estWeightKg" min="0" step="0.1" oninput="updateFullServiceFee()"></div>
+          <div class="summary-card" style="padding:12px 16px;">
+            <div class="summary-row"><span data-i18n="fsFeeLabel">Full-service fee (estimate)</span><span class="v" id="fsFeePreview">฿100</span></div>
+            <div class="summary-note" data-i18n="fsFeeNote">Base ฿100 covers up to 5kg within 50km. Extra weight is ฿10/kg — confirmed by staff at pickup.</div>
+          </div>
+        </div>
+
         <div class="field">
           <label data-i18n="lblSize">Locker size</label>
           <div class="size-grid">
@@ -337,6 +355,7 @@
           <h4 data-i18n="lockerFeeLabel">LOCKER FEE (WHAT YOU ACTUALLY PAY)</h4>
           <div class="summary-row"><span id="sumSizeMode">—</span><span class="v" id="sumRate">—</span></div>
           <div class="summary-row"><span data-i18n="sumDays">Days</span><span class="v" id="sumDays">—</span></div>
+          <div class="summary-row hide" id="sumFsRow"><span data-i18n="fsFeeLabel">Full-service fee (estimate)</span><span class="v" id="sumFsFee">฿0</span></div>
           <div class="summary-row total"><span data-i18n="sumTotal">Total due now</span><span class="v" id="sumTotal">฿0</span></div>
         </div>
 
@@ -450,6 +469,8 @@
       <div class="admin-form-row"><input type="number" id="setTempCold"><input type="number" id="setTempFrozen"></div>
       <span class="lbl-inline">Retrieval fee: small / medium / large (฿)</span>
       <div class="admin-form-row"><input type="number" id="setRetSmall"><input type="number" id="setRetMed"><input type="number" id="setRetLarge"></div>
+      <span class="lbl-inline">Full service: base fee / free kg / coverage km / overage per kg (฿)</span>
+      <div class="admin-form-row"><input type="number" id="setFsBase"><input type="number" id="setFsFreeKg"><input type="number" id="setFsCoverageKm"><input type="number" id="setFsOveragePerKg"></div>
       <div class="admin-form-row"><button onclick="saveSettings()" style="flex:0 0 100%;">Save Settings</button></div>
       <div class="checkin-result" id="settingsMsg"></div>
     </div>
@@ -510,10 +531,19 @@ const I18N = {
     logoutBtn:"Log Out", tabBook:"Book", tabTrack:"Track",
     step1Label:"STEP 1 — SEARCH ITEMS", step1Title:"What Do You Want?",
     itemModeLink:"Link/Search", itemModePhoto:"Photo",
+    lblLinkField:"Product link (optional)", lblPhotoField:"Or upload a photo (optional)", lblDescField:"Description",
     phQuery:"Paste a link or describe the item", phQty:"Qty", phDetails:"Details (color, size, etc.)", phEstPrice:"Est. price (optional)",
     addItemBtn:"+ Add Another Item", nextStep2:"Next: Choose Locker →",
     step2Label:"STEP 2 — CHOOSE YOUR LOCKER", step2Title:"Size & Storage Mode",
     lblSize:"Locker size", lblTemp:"Storage mode",
+    lblDelivery:"How will the item reach us?",
+    deliverySelf:"I'll drop it off myself", deliverySelfNote:"Free",
+    deliveryFull:"Full Service — we pick it up",
+    lblStoreName:"Store name", phStoreName:"e.g. ABC Electronics",
+    lblStoreAddress:"Store address", phStoreAddress:"Address or map link",
+    lblEstWeight:"Estimated weight (kg)",
+    fsFeeLabel:"Full-service fee (estimate)",
+    fsFeeNote:"Base ฿100 covers up to 5kg within 50km. Extra weight is ฿10/kg — confirmed by staff at pickup.",
     tempNormal:"Normal", tempCold:"Cold 13°C", tempFrozen:"Frozen -2°C",
     lblDropoff:"Drop-off date", lblPickup:"Pickup date",
     back:"← Back", nextStep3:"Next: Payment →",
@@ -562,10 +592,19 @@ const I18N = {
     logoutBtn:"登出", tabBook:"预订", tabTrack:"追踪",
     step1Label:"第一步 — 搜索商品", step1Title:"您想要什么？",
     itemModeLink:"链接/搜索", itemModePhoto:"照片",
+    lblLinkField:"商品链接（可选）", lblPhotoField:"或上传照片（可选）", lblDescField:"描述",
     phQuery:"粘贴链接或描述商品", phQty:"数量", phDetails:"细节（颜色、尺寸等）", phEstPrice:"预估价格（可选）",
     addItemBtn:"+ 添加更多商品", nextStep2:"下一步：选择寄存柜 →",
     step2Label:"第二步 — 选择寄存柜", step2Title:"尺寸与存储模式",
     lblSize:"柜子尺寸", lblTemp:"存储模式",
+    lblDelivery:"商品如何送达？",
+    deliverySelf:"我自行送来", deliverySelfNote:"免费",
+    deliveryFull:"全程服务 — 我们代为取货",
+    lblStoreName:"店铺名称", phStoreName:"例如 ABC 电子",
+    lblStoreAddress:"店铺地址", phStoreAddress:"地址或地图链接",
+    lblEstWeight:"预估重量（公斤）",
+    fsFeeLabel:"全程服务费（预估）",
+    fsFeeNote:"基本费用 ฿100 涵盖5公斤以内、50公里范围。超出部分每公斤加收฿10 — 由工作人员取货时确认。",
     tempNormal:"常温", tempCold:"冷藏 13°C", tempFrozen:"冷冻 -2°C",
     lblDropoff:"存入日期", lblPickup:"取件日期",
     back:"← 返回", nextStep3:"下一步：付款 →",
@@ -604,6 +643,7 @@ let ADMIN_SESSION_PIN = null;
 let SETTINGS = null;
 let selectedSize = 'M';
 let selectedTemp = 'normal';
+let selectedDelivery = 'self';
 let currentCustomer = null; // { id, first_name, last_name, phone } — in-memory only, resets on reload
 let cartItems = []; // { mode: 'link'|'photo', query, imageUrl, qty, details, estPrice }
 let itemRowCounter = 0;
@@ -694,9 +734,6 @@ function removeItemRow(id){
   cartItems = cartItems.filter(it=>it.id!==id);
   renderItemRows();
 }
-function setItemMode(id, mode){
-  const it = cartItems.find(i=>i.id===id); if(it){ it.mode = mode; } renderItemRows();
-}
 function updateItemField(id, field, value){
   const it = cartItems.find(i=>i.id===id); if(it){ it[field] = value; }
 }
@@ -720,19 +757,16 @@ function renderItemRows(){
     div.innerHTML = `
       <span class="item-num">#${idx+1}</span>
       ${cartItems.length>1 ? `<button class="remove-item" onclick="removeItemRow(${it.id})">×</button>` : ''}
-      <div class="item-toggle">
-        <button class="${it.mode==='link'?'active':''}" onclick="setItemMode(${it.id},'link')">${I18N[currentLang].itemModeLink}</button>
-        <button class="${it.mode==='photo'?'active':''}" onclick="setItemMode(${it.id},'photo')">${I18N[currentLang].itemModePhoto}</button>
-      </div>
-      ${it.mode==='link'
-        ? `<input type="text" placeholder="${I18N[currentLang].phQuery}" value="${it.query||''}" oninput="updateItemField(${it.id},'query',this.value)">`
-        : `<input type="file" accept="image/*" onchange="handleItemPhoto(${it.id}, this.files[0])">`
-      }
+      <label style="font-size:11px; font-weight:600; opacity:0.75; display:block; margin-bottom:3px;">${I18N[currentLang].lblLinkField}</label>
+      <input type="text" placeholder="${I18N[currentLang].phQuery}" value="${it.query||''}" oninput="updateItemField(${it.id},'query',this.value)">
+      <label style="font-size:11px; font-weight:600; opacity:0.75; display:block; margin:8px 0 3px;">${I18N[currentLang].lblPhotoField}</label>
+      <input type="file" accept="image/*" onchange="handleItemPhoto(${it.id}, this.files[0])">
+      <label style="font-size:11px; font-weight:600; opacity:0.75; display:block; margin:8px 0 3px;">${I18N[currentLang].lblDescField}</label>
+      <input type="text" placeholder="${I18N[currentLang].phDetails}" value="${it.details||''}" oninput="updateItemField(${it.id},'details',this.value)">
       <div class="item-row">
         <div><input type="number" min="1" placeholder="${I18N[currentLang].phQty}" value="${it.qty}" oninput="updateItemField(${it.id},'qty',this.value)"></div>
         <div><input type="number" min="0" placeholder="${I18N[currentLang].phEstPrice}" value="${it.estPrice||''}" oninput="updateItemField(${it.id},'estPrice',this.value)"></div>
       </div>
-      <input type="text" style="margin-top:8px;" placeholder="${I18N[currentLang].phDetails}" value="${it.details||''}" oninput="updateItemField(${it.id},'details',this.value)">
     `;
     container.appendChild(div);
   });
@@ -749,11 +783,32 @@ async function loadSettings(){
   document.getElementById('sr-XL').textContent = "฿"+data.size_xl_rate+"/day";
   document.getElementById('tr-cold').textContent = "+฿"+data.temp_cold_addon;
   document.getElementById('tr-frozen').textContent = "+฿"+data.temp_frozen_addon;
+  document.getElementById('fs-rate-preview').textContent = "From ฿"+data.full_service_base_fee;
+  updateFullServiceFee();
 }
 function sizeRate(size){ if(!SETTINGS) return 0; return { S: SETTINGS.size_s_rate, M: SETTINGS.size_m_rate, L: SETTINGS.size_l_rate, XL: SETTINGS.size_xl_rate }[size] || 0; }
 function tempAddon(temp){ if(!SETTINGS) return 0; return { normal: 0, cold: SETTINGS.temp_cold_addon, frozen: SETTINGS.temp_frozen_addon }[temp] || 0; }
 function selectSize(size){ selectedSize = size; document.querySelectorAll('.size-opt').forEach(el=>el.classList.toggle('selected', el.dataset.size===size)); }
-function selectTemp(temp){ selectedTemp = temp; document.querySelectorAll('.temp-opt').forEach(el=>el.classList.toggle('selected', el.dataset.temp===temp)); }
+function selectTemp(temp){ selectedTemp = temp; document.querySelectorAll('.temp-opt[data-temp]').forEach(el=>el.classList.toggle('selected', el.dataset.temp===temp)); }
+function selectDelivery(opt){
+  selectedDelivery = opt;
+  document.querySelectorAll('.temp-opt[data-delivery]').forEach(el=>el.classList.toggle('selected', el.dataset.delivery===opt));
+  document.getElementById('fullServiceFields').classList.toggle('hide', opt!=='full_service');
+  updateFullServiceFee();
+}
+function fullServiceFee(){
+  if(!SETTINGS) return 0;
+  const w = parseFloat(document.getElementById('estWeightKg')?.value) || 0;
+  let fee = SETTINGS.full_service_base_fee || 100;
+  const freeKg = SETTINGS.full_service_free_kg || 5;
+  const overage = SETTINGS.full_service_overage_per_kg || 10;
+  if(w > freeKg){ fee += (w - freeKg) * overage; }
+  return fee;
+}
+function updateFullServiceFee(){
+  const preview = document.getElementById('fsFeePreview');
+  if(preview) preview.textContent = "฿" + fullServiceFee();
+}
 
 /* ---------- Step 3: payment summary ---------- */
 function renderPaymentSummary(){
@@ -762,7 +817,10 @@ function renderPaymentSummary(){
   list.innerHTML = "";
   let totalEst = 0;
   cartItems.forEach((it,idx)=>{
-    const label = it.mode==='photo' ? (it.imageUrl ? (L?"照片已上传":"Photo uploaded") : (L?"（无照片）":"(no photo)")) : (it.query || (L?"（未填写）":"(blank)"));
+    const parts = [];
+    if(it.query) parts.push(it.query);
+    if(it.imageUrl) parts.push(L?"（含照片）":"(with photo)");
+    const label = parts.length ? parts.join(' ') : (L?"（未填写）":"(blank)");
     const price = parseFloat(it.estPrice)||0;
     totalEst += price * (parseInt(it.qty)||1);
     const row = document.createElement('div');
@@ -779,9 +837,17 @@ function renderPaymentSummary(){
 
   document.getElementById('sumSizeMode').textContent = selectedSize + " / " + selectedTemp;
   document.getElementById('sumRate').textContent = "฿"+rate+"/day";
-  document.getElementById('sumDays').nextElementSibling; // noop
   document.getElementById('sumDays').textContent = days;
-  document.getElementById('sumTotal').textContent = "฿" + (rate*days);
+
+  const fsRow = document.getElementById('sumFsRow');
+  const fs = selectedDelivery === 'full_service' ? fullServiceFee() : 0;
+  if(selectedDelivery === 'full_service'){
+    fsRow.classList.remove('hide');
+    document.getElementById('sumFsFee').textContent = "฿" + fs;
+  } else {
+    fsRow.classList.add('hide');
+  }
+  document.getElementById('sumTotal').textContent = "฿" + (rate*days + fs);
 }
 document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('dropoffDate').addEventListener('change', ()=>{});
@@ -807,11 +873,15 @@ async function createBooking(evt){
   if(btnEl){ btnEl.disabled = true; btnEl.style.opacity = 0.6; }
 
   const firstItemLabel = cartItems.map(it => it.query || (it.imageUrl ? (L?"照片":"Photo") : "")).filter(Boolean).join("; ");
+  const storeName = document.getElementById('pickupStoreName')?.value.trim() || null;
+  const storeAddress = document.getElementById('pickupStoreAddress')?.value.trim() || null;
+  const estWeight = selectedDelivery === 'full_service' ? (parseFloat(document.getElementById('estWeightKg')?.value) || null) : null;
 
-  const { data: rate, error } = await sb.rpc('customer_book_locker', {
+  const { data: rate, error } = await sb.rpc('customer_book_locker_v3', {
     p_ref: ref, p_item: firstItemLabel || (L?"未填写":"n/a"), p_qty: cartItems.reduce((s,it)=>s+(parseInt(it.qty)||1),0),
     p_recipient: recipient, p_contact: contact, p_courier_tracking: null, p_photo_url: cartItems.find(it=>it.imageUrl)?.imageUrl || null,
-    p_size: selectedSize, p_temp_mode: selectedTemp, p_dropoff_date: dropoff, p_pickup_date: pickup
+    p_size: selectedSize, p_temp_mode: selectedTemp, p_dropoff_date: dropoff, p_pickup_date: pickup,
+    p_delivery_option: selectedDelivery, p_pickup_store_name: storeName, p_pickup_store_address: storeAddress, p_est_weight_kg: estWeight
   });
 
   if(error){ if(btnEl){ btnEl.disabled=false; btnEl.style.opacity=1; } alert((L?"预订出错：":"Booking error: ") + error.message); return; }
@@ -819,7 +889,7 @@ async function createBooking(evt){
   // Save each cart item as its own row for the shop's manifest
   for(const it of cartItems){
     await sb.from('order_items').insert({
-      order_ref: ref, query_text: it.mode==='link' ? it.query : null, image_url: it.imageUrl,
+      order_ref: ref, query_text: it.query || null, image_url: it.imageUrl,
       quantity: parseInt(it.qty)||1, details: it.details, estimated_price: it.estPrice ? parseFloat(it.estPrice) : null
     });
   }
@@ -830,7 +900,8 @@ async function createBooking(evt){
   if(btnEl){ btnEl.disabled = false; btnEl.style.opacity = 1; }
 
   const days = Math.max(1, Math.round((new Date(pickup) - new Date(dropoff)) / 86400000));
-  window._pendingBooking = { ref, cartItems: [...cartItems], dropoff, pickup, total: rate*days, contact, recipient };
+  const fsFeeFinal = selectedDelivery === 'full_service' ? fullServiceFee() : 0;
+  window._pendingBooking = { ref, cartItems: [...cartItems], dropoff, pickup, total: rate*days + fsFeeFinal, contact, recipient, deliveryOption: selectedDelivery, storeName, storeAddress };
 
   document.getElementById('r-ref').textContent = ref;
   document.getElementById('r-size').textContent = selectedSize + " / " + selectedTemp;
@@ -862,6 +933,12 @@ async function confirmInlinePayment(evt){
       msg += `${i+1}. ${it.query || (it.imageUrl ? (L?'[Photo] ':'[Photo] ')+it.imageUrl : '')} x${it.qty}` + (it.details ? ` (${it.details})` : '') + "\n";
     });
     msg += (L ? "存入：" : "Drop-off: ") + b.dropoff + "  " + (L ? "取件：" : "Pickup: ") + b.pickup + "\n";
+    if(b.deliveryOption === 'full_service'){
+      msg += (L ? "服务方式：全程服务（代取货）\n" : "Delivery: FULL SERVICE (we collect)\n");
+      msg += (L ? "取货店铺：" : "Pickup from: ") + (b.storeName||"-") + ", " + (b.storeAddress||"-") + "\n";
+    } else {
+      msg += (L ? "服务方式：客户自行送达\n" : "Delivery: Customer drop-off\n");
+    }
     msg += (L ? "应付总额：" : "Amount due: ") + "฿" + b.total + "\n";
     msg += (L ? "姓名：" : "Name: ") + b.recipient + "\n";
     msg += (L ? "联系方式：" : "Contact: ") + b.contact;
@@ -989,16 +1066,22 @@ async function loadSettingsIntoAdminForm(){
   document.getElementById('setRetSmall').value = data.retrieval_small;
   document.getElementById('setRetMed').value = data.retrieval_medium;
   document.getElementById('setRetLarge').value = data.retrieval_large;
+  document.getElementById('setFsBase').value = data.full_service_base_fee;
+  document.getElementById('setFsFreeKg').value = data.full_service_free_kg;
+  document.getElementById('setFsCoverageKm').value = data.full_service_coverage_km;
+  document.getElementById('setFsOveragePerKg').value = data.full_service_overage_per_kg;
 }
 async function saveSettings(){
   const msgEl = document.getElementById('settingsMsg');
-  const { error } = await sb.rpc('admin_update_settings_v2', {
+  const { error } = await sb.rpc('admin_update_settings_v3', {
     pin: ADMIN_SESSION_PIN,
     p_fx_sell_rate: parseFloat(document.getElementById('setFx').value),
     p_size_s: parseFloat(document.getElementById('setSizeS').value), p_size_m: parseFloat(document.getElementById('setSizeM').value),
     p_size_l: parseFloat(document.getElementById('setSizeL').value), p_size_xl: parseFloat(document.getElementById('setSizeXL').value),
     p_temp_cold: parseFloat(document.getElementById('setTempCold').value), p_temp_frozen: parseFloat(document.getElementById('setTempFrozen').value),
-    p_retrieval_small: parseFloat(document.getElementById('setRetSmall').value), p_retrieval_medium: parseFloat(document.getElementById('setRetMed').value), p_retrieval_large: parseFloat(document.getElementById('setRetLarge').value)
+    p_retrieval_small: parseFloat(document.getElementById('setRetSmall').value), p_retrieval_medium: parseFloat(document.getElementById('setRetMed').value), p_retrieval_large: parseFloat(document.getElementById('setRetLarge').value),
+    p_fs_base: parseFloat(document.getElementById('setFsBase').value), p_fs_free_kg: parseFloat(document.getElementById('setFsFreeKg').value),
+    p_fs_coverage_km: parseFloat(document.getElementById('setFsCoverageKm').value), p_fs_overage_per_kg: parseFloat(document.getElementById('setFsOveragePerKg').value)
   });
   if(error){ msgEl.textContent = "Error: " + error.message; msgEl.style.color = "var(--stamp)"; return; }
   msgEl.textContent = "Settings saved."; msgEl.style.color = "#8FD9A8";
@@ -1048,7 +1131,10 @@ async function renderOrdersTable(){
   if(error){ body.innerHTML = `<tr><td colspan="3">Error: ${error.message}</td></tr>`; return; }
   for(const o of data){
     const tr = document.createElement('tr');
-    const bookingInfo = `${o.locker_size||'—'}/${o.temp_mode||'—'}<br><span style="opacity:0.6;">${o.dropoff_date||'?'} → ${o.pickup_date||'?'}</span><br><span class="paid-chip ${o.booking_paid?'yes':'no'}">${o.booking_paid?'PAID':'UNPAID'}</span>`;
+    const deliveryBadge = o.delivery_option === 'full_service'
+      ? `<br><span class="paid-chip" style="background:var(--stamp);">FULL SERVICE ฿${o.full_service_fee||0}</span><br><span style="opacity:0.6; font-size:10px;">${o.pickup_store_name||'?'} · ${o.est_weight_kg||'?'}kg</span>`
+      : `<br><span style="opacity:0.5; font-size:10px;">Self drop-off</span>`;
+    const bookingInfo = `${o.locker_size||'—'}/${o.temp_mode||'—'}<br><span style="opacity:0.6;">${o.dropoff_date||'?'} → ${o.pickup_date||'?'}</span><br><span class="paid-chip ${o.booking_paid?'yes':'no'}">${o.booking_paid?'PAID':'UNPAID'}</span>${deliveryBadge}<br><button class="del-btn" style="color:var(--mustard); margin-top:4px;" onclick="toggleItemsRow('${o.ref}')">Items ▾</button>`;
     let actionCell = `<span>${o.status}</span>`;
     if(o.status === 'stored'){
       actionCell = `<div>Locker ${o.locker_id}<br>Code: ${o.access_code}</div>
@@ -1063,6 +1149,28 @@ async function renderOrdersTable(){
     }
     tr.innerHTML = `<td class="mono">${o.ref}</td><td style="font-size:11px;">${bookingInfo}</td><td>${actionCell}</td>`;
     body.appendChild(tr);
+
+    const itemsTr = document.createElement('tr');
+    itemsTr.id = "items-row-" + o.ref;
+    itemsTr.className = "hide";
+    itemsTr.innerHTML = `<td colspan="3" style="background:#241010; font-size:11px;"><div id="items-content-${o.ref}">Loading…</div></td>`;
+    body.appendChild(itemsTr);
+  }
+}
+async function toggleItemsRow(ref){
+  const row = document.getElementById('items-row-'+ref);
+  const isHidden = row.classList.contains('hide');
+  row.classList.toggle('hide');
+  if(isHidden){
+    const contentEl = document.getElementById('items-content-'+ref);
+    const { data, error } = await sb.from('order_items').select('*').eq('order_ref', ref).order('created_at');
+    if(error || !data || data.length===0){ contentEl.innerHTML = "No item details recorded."; return; }
+    contentEl.innerHTML = data.map((it,i)=>`
+      <div style="padding:6px 0; border-bottom:1px dotted rgba(228,217,190,0.15);">
+        <b>#${i+1}</b> ${it.query_text ? 'Link/Search: '+it.query_text+'<br>' : ''}
+        ${it.image_url ? `<a href="${it.image_url}" target="_blank" style="color:var(--mustard);">Photo</a><br>` : ''}
+        Qty: ${it.quantity} ${it.details ? '· Notes: '+it.details : ''} ${it.estimated_price ? '· Est: ฿'+it.estimated_price : ''}
+      </div>`).join('');
   }
 }
 async function confirmPayment(ref){
