@@ -8,12 +8,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:wght@500;700;900&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#E4D9BE; --paper-dark:#D8C9A3; --paper-light:#EFE7CF;
-    --ink:#1C2B45; --stamp:#B33A2E; --mustard:#D6A441; --teal:#2E6B63; --charcoal:#2A241D;
-    --sh-sm: 0 1px 2px rgba(28,43,69,0.12), 0 1px 1px rgba(28,43,69,0.08);
-    --sh-md: 0 4px 10px rgba(28,43,69,0.14), 0 2px 4px rgba(28,43,69,0.10);
-    --sh-lg: 6px 8px 0 rgba(28,43,69,0.18);
-    --sh-inset: inset 0 1px 3px rgba(28,43,69,0.15);
+    --paper:#FFFFFF; --paper-dark:#F7D9D6; --paper-light:#FFF3F2;
+    --ink:#8B1E1E; --ink-light:#B23A2E; --stamp:#D32F2F; --mustard:#E8746A; --teal:#A93226; --charcoal:#2A1414;
+    --sh-sm: 0 1px 2px rgba(139,30,30,0.14), 0 1px 1px rgba(139,30,30,0.08);
+    --sh-md: 0 4px 10px rgba(139,30,30,0.16), 0 2px 4px rgba(139,30,30,0.10);
+    --sh-lg: 6px 8px 0 rgba(139,30,30,0.16);
+    --sh-inset: inset 0 1px 3px rgba(139,30,30,0.14);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
@@ -29,7 +29,7 @@
   .wrap{ max-width:480px; margin:0 auto; padding:0 18px 40px; }
   .hide{ display:none !important; }
 
-  .topbar{ position:sticky; top:0; z-index:20; background:linear-gradient(180deg, #22314f, var(--ink)); color:var(--paper); padding:12px 18px; display:flex; align-items:center; justify-content:space-between; box-shadow:var(--sh-md); }
+  .topbar{ position:sticky; top:0; z-index:20; background:linear-gradient(180deg, var(--ink-light), var(--ink)); color:var(--paper); padding:12px 18px; display:flex; align-items:center; justify-content:space-between; box-shadow:var(--sh-md); }
   .brand{ font-family:'Big Shoulders Stencil',sans-serif; font-size:20px; letter-spacing:0.03em; }
   .lang-toggle{ display:flex; border:1.5px solid var(--mustard); border-radius:7px; overflow:hidden; font-size:12px; }
   .lang-toggle button{ background:transparent; color:var(--paper); border:none; padding:6px 10px; font-weight:700; cursor:pointer; }
@@ -43,9 +43,9 @@
   .field input:focus, .field textarea:focus, .field select:focus{ outline:none; border-color:var(--mustard); box-shadow:var(--sh-inset), 0 0 0 3px rgba(214,164,65,0.25); }
   .field input[type=file]{ padding:9px; font-size:12.5px; box-shadow:none; }
 
-  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; background:linear-gradient(180deg, #2be07a, #1fbd63); color:#fff; border:none; padding:15px 20px; border-radius:10px; font-weight:700; font-size:15px; cursor:pointer; box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.25); transition:transform 0.08s ease, box-shadow 0.15s ease; }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; background:linear-gradient(180deg, #e0453f, var(--stamp)); color:#fff; border:none; padding:15px 20px; border-radius:10px; font-weight:700; font-size:15px; cursor:pointer; box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.25); transition:transform 0.08s ease, box-shadow 0.15s ease; }
   .btn:active{ transform:translateY(1px); box-shadow:var(--sh-sm); }
-  .btn.dark{ background:linear-gradient(180deg, #24365a, var(--ink)); color:var(--paper); }
+  .btn.dark{ background:linear-gradient(180deg, var(--ink-light), var(--ink)); color:var(--paper); }
   .btn.outline{ background:var(--paper-light); color:var(--ink); border:2px solid var(--ink); box-shadow:var(--sh-sm); }
   .btn.small{ padding:10px; font-size:13px; }
   .btn:disabled{ opacity:0.5; cursor:default; transform:none; }
@@ -63,7 +63,7 @@
   .social-btn{ display:flex; align-items:center; justify-content:center; gap:8px; padding:12px; border-radius:8px; border:1.5px solid var(--ink); background:var(--paper-light); font-weight:600; font-size:13px; cursor:not-allowed; opacity:0.55; position:relative; }
   .social-btn .soon{ font-size:9px; background:var(--stamp); color:#fff; padding:2px 6px; border-radius:6px; margin-left:6px;}
   .or-divider{ text-align:center; font-size:11px; opacity:0.5; margin:14px 0; }
-  .credentials-box{ background:linear-gradient(180deg,#24365a,var(--ink)); color:var(--mustard); border-radius:10px; padding:16px; text-align:center; margin-top:14px; box-shadow:var(--sh-md); }
+  .credentials-box{ background:linear-gradient(180deg,var(--ink-light),var(--ink)); color:var(--mustard); border-radius:10px; padding:16px; text-align:center; margin-top:14px; box-shadow:var(--sh-md); }
   .credentials-box .row{ display:flex; justify-content:space-between; padding:6px 0; font-size:13px;}
   .credentials-box .row .v{ font-family:'Space Mono',monospace; font-weight:700; font-size:16px;}
   .credentials-box .warn{ font-size:11px; color:#E8B; margin-top:8px;}
@@ -103,7 +103,7 @@
   .field-row{ display:flex; gap:10px; }
   .field-row .field{ flex:1; }
 
-  .summary-card{ background:linear-gradient(165deg,#24365a,var(--ink)); color:var(--paper); border-radius:12px; padding:16px; margin-bottom:14px; box-shadow:var(--sh-md);}
+  .summary-card{ background:linear-gradient(165deg,var(--ink-light),var(--ink)); color:var(--paper); border-radius:12px; padding:16px; margin-bottom:14px; box-shadow:var(--sh-md);}
   .summary-card h4{ font-size:11px; letter-spacing:0.08em; color:var(--mustard); margin-bottom:10px;}
   .summary-row{ display:flex; justify-content:space-between; font-size:13px; padding:5px 0; border-bottom:1px dotted rgba(228,217,190,0.15);}
   .summary-row.total{ border-bottom:none; border-top:2px solid var(--mustard); margin-top:6px; padding-top:10px; font-weight:700; font-size:15px;}
@@ -120,6 +120,12 @@
   .btn-nav-row .btn{ flex:1; }
 
   #receipt-wrap{ margin-top:18px; }
+  .save-reminder{ background:var(--paper-dark); border:2px dashed var(--stamp); border-radius:10px; padding:12px; margin-top:10px; text-align:center; }
+  .save-reminder-text{ font-size:12px; color:var(--ink); margin-bottom:8px; font-weight:600; }
+  .match-card{ background:var(--paper-light); border:1.5px solid var(--ink); border-radius:10px; padding:12px 14px; margin-bottom:8px; cursor:pointer; box-shadow:var(--sh-sm); transition:transform 0.1s ease; }
+  .match-card:active{ transform:translateY(1px); }
+  .match-card .ref{ font-family:'Space Mono',monospace; font-weight:700; color:var(--ink); font-size:13px; }
+  .match-card .meta{ font-size:11.5px; opacity:0.7; margin-top:2px; }
   .receipt{ background:var(--paper-light); border:2px solid var(--ink); border-radius:12px; padding:18px; box-shadow:var(--sh-lg); }
   .receipt-head{ display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px dashed var(--ink); padding-bottom:10px; margin-bottom:10px;}
   .receipt-head .stencil{ font-size:17px; color:var(--ink); }
@@ -147,7 +153,7 @@
   .status-chip.status-booked{ background:var(--stamp); }
   .status-chip.status-stored{ background:var(--teal); }
   .status-chip.status-collected{ background:#6B6156; }
-  .access-code-box{ margin-top:10px; background:linear-gradient(180deg,#24365a,var(--ink)); color:var(--mustard); border-radius:8px; padding:12px; text-align:center; box-shadow:var(--sh-md); }
+  .access-code-box{ margin-top:10px; background:linear-gradient(180deg,var(--ink-light),var(--ink)); color:var(--mustard); border-radius:8px; padding:12px; text-align:center; box-shadow:var(--sh-md); }
   .access-code-box .code{ font-family:'Space Mono',monospace; font-size:24px; letter-spacing:0.15em; font-weight:700; }
   .access-code-box .lbl{ font-size:10px; color:var(--paper); opacity:0.7; letter-spacing:0.08em; }
   .release-box{ margin-top:14px; display:flex; gap:8px; }
@@ -157,14 +163,14 @@
   .tab-nav{ display:flex; gap:8px; margin:16px 0; }
   .tab-nav button{ flex:1; padding:10px; border-radius:8px; border:1.5px solid var(--ink); background:var(--paper-light); font-weight:700; font-size:12px; cursor:pointer; box-shadow:var(--sh-sm); transition:transform 0.1s ease;}
   .tab-nav button:active{ transform:translateY(1px); }
-  .tab-nav button.active{ background:linear-gradient(180deg,#24365a,var(--ink)); color:var(--paper); box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.15); }
+  .tab-nav button.active{ background:linear-gradient(180deg,var(--ink-light),var(--ink)); color:var(--paper); box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.15); }
 
   #admin-view{ background:var(--charcoal); min-height:100vh; color:var(--paper); }
   .admin-wrap{ max-width:560px; margin:0 auto; padding:20px 18px 60px; }
   .admin-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;}
   .admin-header h2{ font-family:'Big Shoulders Stencil',sans-serif; font-size:24px; color:var(--mustard); }
   .back-btn{ background:none; border:1px solid rgba(228,217,190,0.4); color:var(--paper); padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;}
-  .admin-card{ background:#332C24; border-radius:12px; padding:18px; margin-bottom:18px; box-shadow:0 4px 14px rgba(0,0,0,0.35); border-top:3px solid var(--mustard); }
+  .admin-card{ background:#3B1414; border-radius:12px; padding:18px; margin-bottom:18px; box-shadow:0 4px 14px rgba(0,0,0,0.35); border-top:3px solid var(--mustard); }
   .admin-card h3{ font-size:15px; color:var(--mustard); margin-bottom:12px; }
   .admin-form-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
   .admin-form-row input, .admin-form-row select{ flex:1; min-width:70px; padding:10px; border-radius:7px; border:none; font-size:13px; }
@@ -174,7 +180,7 @@
   th{ color:var(--mustard); font-size:11px; letter-spacing:0.05em; text-transform:uppercase;}
   .del-btn{ background:none; border:none; color:#E88; cursor:pointer; font-size:12px; font-weight:700;}
   .lbl-inline{ font-size:11px; opacity:0.6; display:block; margin-bottom:3px; }
-  .checkin-form{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px; padding:10px; background:#241d13; border-radius:8px;}
+  .checkin-form{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px; padding:10px; background:#2E1010; border-radius:8px;}
   .checkin-form label{ display:flex; align-items:center; gap:5px; font-size:11px; }
   .checkin-result{ font-size:12px; color:var(--mustard); margin-top:6px; }
   .paid-chip{ font-size:10px; font-weight:700; padding:2px 6px; border-radius:8px; }
@@ -337,10 +343,13 @@
         <div class="field"><label data-i18n="lblRecipient">Your name (for the locker)</label><input type="text" id="reqRecipient"></div>
         <div class="field"><label data-i18n="lblContact">WhatsApp number</label><input type="text" id="reqContact" data-i18n-ph="phContact" placeholder="+60..."></div>
 
-        <button class="btn dark" onclick="createBooking(event)" data-i18n="confirmBookBtn">Confirm Booking</button>
+        <div class="btn-nav-row">
+          <button class="btn outline" onclick="goToStep(2)" data-i18n="back">← Back</button>
+          <button class="btn dark" onclick="createBooking(event)" data-i18n="confirmBookBtn">Confirm Booking</button>
+        </div>
 
         <div id="receipt-wrap" class="hide">
-          <div class="receipt">
+          <div class="receipt" id="booking-receipt-capture">
             <div class="receipt-head">
               <div><div class="stencil">GrabNGo</div><div style="font-size:11px; opacity:0.6;" data-i18n="receiptSub">Booking Slip</div></div>
               <span class="status-chip status-booked" data-i18n="receiptStatus">BOOKED — UNPAID</span>
@@ -349,6 +358,10 @@
             <div class="receipt-row"><span class="k" data-i18n="rSize">Size / Mode</span><span class="v" id="r-size">—</span></div>
             <div class="receipt-row"><span class="k" data-i18n="rDropoff">Drop-off</span><span class="v" id="r-dropoff">—</span></div>
             <div class="receipt-row"><span class="k" data-i18n="rPickup">Pickup</span><span class="v" id="r-pickup">—</span></div>
+          </div>
+          <div class="save-reminder">
+            <div class="save-reminder-text">📸 <span data-i18n="saveReminderText">Save this now — screenshot or download it so you don't lose your reference and code.</span></div>
+            <button class="btn dark" onclick="downloadSlip('booking-receipt-capture','booking')" data-i18n="downloadSlipBtn">⬇ Download as Image</button>
           </div>
 
           <div class="summary-card" style="margin-top:14px;">
@@ -370,13 +383,17 @@
     <div id="tab-content-track" class="hide">
       <div class="step-label" data-i18n="trackEyebrow">TRACK YOUR BOOKING</div>
       <h2 class="step-title" data-i18n="trackTitle">Enter Your Reference Number</h2>
+      <p style="font-size:12px; opacity:0.7; margin-bottom:8px;" data-i18n="trackHint">You can search by your reference number, or by the name on the booking.</p>
       <div class="track-form">
-        <input type="text" id="trackInput" data-i18n-ph="trackPh" placeholder="e.g. HHC-482913">
+        <input type="text" id="trackInput" data-i18n-ph="trackPh" placeholder="e.g. HHC-482913 or your name">
         <button onclick="trackOrder()" data-i18n="trackBtn">Track</button>
       </div>
       <div class="track-msg" id="trackMsg"></div>
+
+      <div id="track-multi" class="hide"></div>
+
       <div id="track-result" class="hide">
-        <div class="receipt">
+        <div class="receipt" id="track-receipt-capture">
           <div class="receipt-head">
             <div><div class="stencil">GrabNGo</div><div style="font-size:11px; opacity:0.6;" data-i18n="receiptSub">Booking Slip</div></div>
             <span class="status-chip" id="t-status-chip">—</span>
@@ -397,6 +414,10 @@
             <div class="release-box"><input type="text" id="releaseCode" data-i18n-ph="releaseCodePh" placeholder="Access code" maxlength="6"><button onclick="releaseLocker()" data-i18n="releaseBtn">Open</button></div>
             <div class="track-msg" id="releaseMsg"></div>
           </div>
+        </div>
+        <div class="save-reminder">
+          <div class="save-reminder-text">📸 <span data-i18n="saveReminderText">Save this now — screenshot or download it so you don't lose your reference and code.</span></div>
+          <button class="btn dark" onclick="downloadSlip('track-receipt-capture','track')" data-i18n="downloadSlipBtn">⬇ Download as Image</button>
         </div>
       </div>
     </div>
@@ -464,6 +485,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 const SUPABASE_URL = "https://cimippgrdbaspqomimhf.supabase.co";
 const SUPABASE_KEY = "sb_publishable_OYST4lqvXzJEmABg6uknAA_BPzDP6RY";
@@ -511,7 +533,11 @@ const I18N = {
     payMarkedErr:"Something went wrong. Please check and try again.",
     payVerifying:"VERIFYING PAYMENT (5–10 MIN)", payConfirmed:"✓ Confirmed",
     trackEyebrow:"TRACK YOUR BOOKING", trackTitle:"Enter Your Reference Number",
-    trackPh:"e.g. HHC-482913", trackBtn:"Track",
+    trackHint:"You can search by your reference number, or by the name on the booking.",
+    trackPh:"e.g. HHC-482913 or your name", trackBtn:"Track",
+    saveReminderText:"Save this now — screenshot or download it so you don't lose your reference and code.",
+    downloadSlipBtn:"⬇ Download as Image",
+    multiMatchTitle:"Found several bookings — tap one to view it:",
     trackNotFound:"No booking found with that reference.", trackEmpty:"Please enter your reference number.",
     statusBooked:"BOOKED", statusWe_collected:"WE COLLECTED IT", statusStored:"IN STORAGE", statusCollected:"COLLECTED",
     releaseCodePh:"Access code", releaseBtn:"Open",
@@ -559,7 +585,11 @@ const I18N = {
     payMarkedErr:"出现错误，请核对后重试。",
     payVerifying:"核实付款中（5-10分钟）", payConfirmed:"✓ 已确认",
     trackEyebrow:"追踪您的预订", trackTitle:"输入您的编号",
-    trackPh:"例如 HHC-482913", trackBtn:"追踪",
+    trackHint:"您可以用编号，或用预订时填写的姓名来查询。",
+    trackPh:"例如 HHC-482913 或您的姓名", trackBtn:"追踪",
+    saveReminderText:"请立即保存——截图或下载，以免遗失编号和密码。",
+    downloadSlipBtn:"⬇ 下载为图片",
+    multiMatchTitle:"找到多笔预订——点选查看：",
     trackNotFound:"找不到该编号对应的预订。", trackEmpty:"请输入您的编号。",
     statusBooked:"已预订", statusWe_collected:"已代取", statusStored:"寄存中", statusCollected:"已领取",
     releaseCodePh:"访问密码", releaseBtn:"开柜",
@@ -841,14 +871,43 @@ async function confirmInlinePayment(evt){
 
 /* ---------- track ---------- */
 async function trackOrder(){
-  const ref = document.getElementById('trackInput').value.trim().toUpperCase();
+  const query = document.getElementById('trackInput').value.trim();
   const msgEl = document.getElementById('trackMsg');
   const resultEl = document.getElementById('track-result');
-  if(!ref){ msgEl.textContent = I18N[currentLang].trackEmpty; resultEl.classList.add('hide'); return; }
+  const multiEl = document.getElementById('track-multi');
+  multiEl.classList.add('hide'); multiEl.innerHTML = "";
+  if(!query){ msgEl.textContent = I18N[currentLang].trackEmpty; resultEl.classList.add('hide'); return; }
   msgEl.textContent = "…";
-  const { data: order, error } = await sb.from('orders').select('*').eq('ref', ref).maybeSingle();
-  if(error || !order){ msgEl.textContent = I18N[currentLang].trackNotFound; resultEl.classList.add('hide'); return; }
+
+  // 1) Try as an exact reference number first
+  const { data: byRef } = await sb.from('orders').select('*').eq('ref', query.toUpperCase()).maybeSingle();
+  if(byRef){ msgEl.textContent = ""; displayTrackedOrder(byRef); return; }
+
+  // 2) Fall back to searching by recipient name (works even without logging in)
+  const { data: byName, error } = await sb.from('orders').select('*').ilike('recipient', '%'+query+'%').order('created_at', {ascending:false});
+  if(error || !byName || byName.length===0){ msgEl.textContent = I18N[currentLang].trackNotFound; resultEl.classList.add('hide'); return; }
+
+  if(byName.length === 1){ msgEl.textContent = ""; displayTrackedOrder(byName[0]); return; }
+
+  // Multiple bookings match this name — let the customer pick one
   msgEl.textContent = "";
+  resultEl.classList.add('hide');
+  const title = document.createElement('div');
+  title.style.cssText = "font-size:12px; font-weight:600; margin-bottom:8px; color:var(--ink);";
+  title.textContent = I18N[currentLang].multiMatchTitle;
+  multiEl.appendChild(title);
+  byName.forEach(o=>{
+    const card = document.createElement('div');
+    card.className = 'match-card';
+    card.innerHTML = `<div class="ref">${o.ref}</div><div class="meta">${o.recipient} · ${o.dropoff_date||'?'} → ${o.pickup_date||'?'} · ${o.status}</div>`;
+    card.onclick = ()=>{ multiEl.classList.add('hide'); displayTrackedOrder(o); };
+    multiEl.appendChild(card);
+  });
+  multiEl.classList.remove('hide');
+}
+
+function displayTrackedOrder(order){
+  const resultEl = document.getElementById('track-result');
   document.getElementById('t-ref').textContent = order.ref;
   document.getElementById('t-size').textContent = (order.locker_size||"—") + " / " + (order.temp_mode||"—");
   document.getElementById('t-dropoff').textContent = order.dropoff_date || "—";
@@ -873,6 +932,17 @@ async function trackOrder(){
     releaseWrap.classList.remove('hide');
   } else { lockerWrap.classList.add('hide'); releaseWrap.classList.add('hide'); }
   resultEl.classList.remove('hide');
+}
+
+/* ---------- download booking slip as an image (so customers don't lose their ref/code) ---------- */
+async function downloadSlip(elementId, prefix){
+  const el = document.getElementById(elementId);
+  if(!el || typeof html2canvas === 'undefined') return;
+  const canvas = await html2canvas(el, { backgroundColor: '#FFFFFF', scale: 2 });
+  const link = document.createElement('a');
+  link.download = prefix + "-slip-" + Date.now() + ".png";
+  link.href = canvas.toDataURL('image/png');
+  link.click();
 }
 async function releaseLocker(){
   const ref = document.getElementById('t-ref').textContent.trim();
