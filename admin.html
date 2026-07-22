@@ -231,6 +231,20 @@
     </div>
 
     <div class="admin-card">
+      <h3>Currency Display Rates</h3>
+      <span class="lbl-inline">Bank rate (THB per 1 unit) — reference Kasikornbank's current rate</span>
+      <div class="admin-form-row">
+        <input type="number" step="0.01" id="setRateMyr" placeholder="MYR">
+        <input type="number" step="0.01" id="setRateSgd" placeholder="SGD">
+        <input type="number" step="0.01" id="setRateCny" placeholder="CNY">
+      </div>
+      <span class="lbl-inline">Margin added on top (%) — shop profit</span>
+      <div class="admin-form-row"><input type="number" step="0.1" id="setFxMargin"></div>
+      <div class="admin-form-row"><button onclick="saveCurrencyRates()" style="flex:0 0 100%;">Save Currency Rates</button></div>
+      <div class="checkin-result" id="currencyMsg"></div>
+    </div>
+
+    <div class="admin-card">
       <h3>Change Staff PIN</h3>
       <div class="admin-form-row">
         <input type="password" id="admOldPin" placeholder="Current PIN" inputmode="numeric" maxlength="6">
@@ -251,6 +265,11 @@
         <input type="text" id="admCode" placeholder="CODE"><input type="number" id="admPercent" placeholder="% off" min="1" max="100"><input type="text" id="admExpiry" placeholder="Expiry"><button onclick="addPromoCode()">+ Add</button>
       </div>
       <table><thead><tr><th>Code</th><th>Discount</th><th>Expires</th><th></th></tr></thead><tbody id="promoTableBody"></tbody></table>
+    </div>
+
+    <div class="admin-card">
+      <h3>Wallet Top-Ups</h3>
+      <table><thead><tr><th>Ref</th><th>Customer</th><th>Amount</th><th>Status / Action</th></tr></thead><tbody id="topupsTableBody"></tbody></table>
     </div>
 
     <div class="admin-card">
@@ -283,7 +302,7 @@ async function checkPin(){
   ADMIN_SESSION_PIN = val; errEl.textContent = "";
   document.getElementById('login-screen').classList.add('hide');
   document.getElementById('admin-view').classList.remove('hide');
-  renderPromoTable(); renderOrdersTable(); renderLockersTable(); loadSettingsIntoAdminForm();
+  renderPromoTable(); renderOrdersTable(); renderLockersTable(); loadSettingsIntoAdminForm(); renderTopupsTable();
 }
 function logoutAdmin(){
   ADMIN_SESSION_PIN = null;
@@ -319,6 +338,22 @@ async function loadSettingsIntoAdminForm(){
   document.getElementById('setFsFreeKg').value = data.full_service_free_kg;
   document.getElementById('setFsCoverageKm').value = data.full_service_coverage_km;
   document.getElementById('setFsOveragePerKg').value = data.full_service_overage_per_kg;
+  document.getElementById('setRateMyr').value = data.rate_myr_bank;
+  document.getElementById('setRateSgd').value = data.rate_sgd_bank;
+  document.getElementById('setRateCny').value = data.rate_cny_bank;
+  document.getElementById('setFxMargin').value = data.fx_margin_percent;
+}
+async function saveCurrencyRates(){
+  const msgEl = document.getElementById('currencyMsg');
+  const { error } = await sb.rpc('admin_update_currency_rates', {
+    pin: ADMIN_SESSION_PIN,
+    p_myr: parseFloat(document.getElementById('setRateMyr').value),
+    p_sgd: parseFloat(document.getElementById('setRateSgd').value),
+    p_cny: parseFloat(document.getElementById('setRateCny').value),
+    p_margin: parseFloat(document.getElementById('setFxMargin').value)
+  });
+  if(error){ msgEl.textContent = "Error: " + error.message; msgEl.style.color = "#E88"; return; }
+  msgEl.textContent = "Currency rates saved."; msgEl.style.color = "#8FD9A8";
 }
 async function saveSettings(){
   const msgEl = document.getElementById('settingsMsg');
@@ -360,6 +395,32 @@ async function removePromo(code){
   const { error } = await sb.rpc('admin_remove_promo', { pin: ADMIN_SESSION_PIN, p_code: code });
   if(error){ alert("Error removing code: " + error.message); return; }
   renderPromoTable();
+}
+async function renderTopupsTable(){
+  const body = document.getElementById('topupsTableBody');
+  const { data, error } = await sb.rpc('admin_list_pending_topups');
+  body.innerHTML = "";
+  if(error){ body.innerHTML = `<tr><td colspan="4">Error: ${error.message}</td></tr>`; return; }
+  if(!data || data.length===0){ body.innerHTML = `<tr><td colspan="4">No top-up requests.</td></tr>`; return; }
+  data.forEach(t=>{
+    const tr = document.createElement('tr');
+    let actionCell = `<span style="opacity:0.6;">Pending</span>`;
+    if(t.status === 'confirmed'){
+      actionCell = `<span class="paid-chip yes">CONFIRMED</span>`;
+    } else if(t.status === 'claimed'){
+      const claimedAgo = t.payment_claimed_at ? Math.round((Date.now() - new Date(t.payment_claimed_at).getTime())/60000) : '?';
+      actionCell = `<div>Claimed ${claimedAgo}m ago<br><button onclick="confirmTopup('${t.ref}')">Confirm Payment</button><div class="checkin-result" id="topup-result-${t.ref}"></div></div>`;
+    }
+    tr.innerHTML = `<td class="mono">${t.ref}</td><td>${t.customer_name}</td><td class="mono">\u0e3f${t.amount}</td><td>${actionCell}</td>`;
+    body.appendChild(tr);
+  });
+}
+async function confirmTopup(ref){
+  const resultEl = document.getElementById('topup-result-'+ref);
+  const { error } = await sb.rpc('admin_confirm_topup', { pin: ADMIN_SESSION_PIN, p_ref: ref });
+  if(error){ resultEl.textContent = "Error: " + error.message; resultEl.style.color = "#E88"; return; }
+  resultEl.textContent = "Confirmed."; resultEl.style.color = "#8FD9A8";
+  renderTopupsTable();
 }
 async function renderLockersTable(){
   const body = document.getElementById('lockersTableBody');
@@ -483,6 +544,7 @@ async function exportBookingsToExcel(){
   const { data: orders, error } = await sb.from('orders').select('*').order('created_at', {ascending:false});
   if(error || !orders){ alert("Error loading bookings: " + (error?.message||"unknown")); return; }
   const { data: items } = await sb.from('order_items').select('*');
+  const { data: topups } = await sb.rpc('admin_list_pending_topups');
 
   const bookingRows = orders.map(o => ({
     Reference: o.ref,
@@ -516,9 +578,19 @@ async function exportBookingsToExcel(){
     "Estimated Price": it.estimated_price || ""
   }));
 
+  const topupRows = (topups||[]).map(t => ({
+    Reference: t.ref,
+    Customer: t.customer_name,
+    Amount: t.amount,
+    Status: t.status,
+    "Payment Claimed At": t.payment_claimed_at || "",
+    "Created At": t.created_at
+  }));
+
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(bookingRows), "Bookings");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(itemRows), "Item Details");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(topupRows), "Wallet Top-Ups");
   XLSX.writeFile(wb, "grabngo-bookings-" + new Date().toISOString().slice(0,10) + ".xlsx");
 }
 </script>
