@@ -223,26 +223,26 @@
     </div>
   </div>
   <div class="wrap">
-    <div class="auth-hero">
-      <h1 class="stencil" data-i18n="authHero">Shop Free.<br>We Pack It.<br>Grab &amp; Go.</h1>
-      <p data-i18n="authSub">Create an account to book a locker and track your items.</p>
-      <div class="stamp-badge" data-i18n="noMarkupBadge">✓ ZERO MARKUP ON GOODS</div>
+    <div class="carousel">
+      <div class="carousel-track" id="carouselTrack">
+        <div class="carousel-slide" style="background:linear-gradient(135deg,#8B1E1E,#D32F2F);">Promo Slide 1</div>
+        <div class="carousel-slide" style="background:linear-gradient(135deg,#B23A2E,#E8746A);">Promo Slide 2</div>
+        <div class="carousel-slide" style="background:linear-gradient(135deg,#6b1414,#A93226);">Promo Slide 3</div>
+        <div class="carousel-slide" style="background:linear-gradient(135deg,#8B1E1E,#c0392b);">Promo Slide 4</div>
+        <div class="carousel-slide" style="background:linear-gradient(135deg,#5a1010,#8B1E1E);">Promo Slide 5</div>
+      </div>
+      <button class="carousel-arrow left" onclick="carouselMove(-1)">‹</button>
+      <button class="carousel-arrow right" onclick="carouselMove(1)">›</button>
+      <div class="carousel-dots" id="carouselDots"></div>
     </div>
 
-    <div class="stores-strip">
-      <div class="stores-strip-label" data-i18n="storesLabel">FULL-SERVICE PICKUP AVAILABLE AT</div>
-      <div class="stores-chips">
-        <span class="store-chip">🏪 7-Eleven</span>
-        <span class="store-chip">📦 Makro</span>
-        <span class="store-chip">🛒 Go Wholesale</span>
-        <span class="store-chip">🛍️ Lotus's</span>
-        <span class="store-chip">🏬 Central Hatyai</span>
-        <span class="store-chip more" data-i18n="storesMore">+ more stores</span>
-      </div>
+    <div class="auth-hero" style="margin-top:18px; padding:16px 14px 14px;">
+      <p style="font-size:13px; opacity:0.75;" data-i18n="authSub">Log in or sign up to book a locker.</p>
     </div>
 
     <div class="auth-tabs">
       <button id="tab-login" class="active" onclick="setAuthTab('login')" data-i18n="tabLogin">Log In</button>
+
       <button id="tab-signup" onclick="setAuthTab('signup')" data-i18n="tabSignup">Sign Up</button>
     </div>
 
@@ -309,19 +309,10 @@
 
     <!-- ===== HOME (default view, ad carousel) ===== -->
     <div id="tab-content-home">
-      <div class="carousel">
-        <div class="carousel-track" id="carouselTrack">
-          <div class="carousel-slide" style="background:linear-gradient(135deg,#8B1E1E,#D32F2F);">Promo Slide 1</div>
-          <div class="carousel-slide" style="background:linear-gradient(135deg,#B23A2E,#E8746A);">Promo Slide 2</div>
-          <div class="carousel-slide" style="background:linear-gradient(135deg,#6b1414,#A93226);">Promo Slide 3</div>
-          <div class="carousel-slide" style="background:linear-gradient(135deg,#8B1E1E,#c0392b);">Promo Slide 4</div>
-          <div class="carousel-slide" style="background:linear-gradient(135deg,#5a1010,#8B1E1E);">Promo Slide 5</div>
-        </div>
-        <button class="carousel-arrow left" onclick="carouselMove(-1)">‹</button>
-        <button class="carousel-arrow right" onclick="carouselMove(1)">›</button>
-        <div class="carousel-dots" id="carouselDots"></div>
+      <div class="auth-hero" style="text-align:center;">
+        <h2 class="step-title" style="margin-bottom:4px;" data-i18n="homeWelcome">Welcome back!</h2>
+        <p style="font-size:12.5px; opacity:0.75;" data-i18n="homeWelcomeSub">Use the buttons below to get started.</p>
       </div>
-      <p style="text-align:center; font-size:11px; opacity:0.6; margin-top:10px;" data-i18n="carouselNote">Shop promotions and updates will appear here.</p>
 
       <div class="stores-strip" style="margin-top:20px;">
         <div class="stores-strip-label" data-i18n="storesLabel">FULL-SERVICE PICKUP AVAILABLE AT</div>
@@ -609,6 +600,7 @@ const I18N = {
     trackHint:"Looking up a booking for someone else? Search by reference number or name below.",
     navSearch:"Search Items", navBookings:"My Bookings", navWallet:"My Wallet", navContact:"Contact Admin",
     carouselNote:"Shop promotions and updates will appear here.",
+    homeWelcome:"Welcome back!", homeWelcomeSub:"Use the buttons below to get started.",
     myBookingsLabel:"MY BOOKINGS", myBookingsTitle:"Your Bookings",
     walletLabel:"MY WALLET", walletTitle:"Billing Summary",
     walletTotalPaid:"Total paid", walletTotalPending:"Awaiting payment",
@@ -679,6 +671,7 @@ const I18N = {
     trackHint:"要查询别人的预订吗？请在下方用编号或姓名搜索。",
     navSearch:"搜索商品", navBookings:"我的预订", navWallet:"我的钱包", navContact:"联系客服",
     carouselNote:"店铺优惠及最新消息将显示于此。",
+    homeWelcome:"欢迎回来！", homeWelcomeSub:"请使用下方按钮开始使用。",
     myBookingsLabel:"我的预订", myBookingsTitle:"您的预订",
     walletLabel:"我的钱包", walletTitle:"账单摘要",
     walletTotalPaid:"已付总额", walletTotalPending:"待付款总额",
@@ -714,7 +707,6 @@ function setLang(l){
   document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = I18N[l][el.getAttribute('data-i18n')]; });
   document.querySelectorAll('[data-i18n-html]').forEach(el=>{ el.innerHTML = I18N[l][el.getAttribute('data-i18n-html')]; });
   document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.placeholder = I18N[l][el.getAttribute('data-i18n-ph')]; });
-  document.querySelector('.auth-hero h1').innerHTML = I18N[l].authHero;
   renderItemRows();
 }
 
@@ -761,7 +753,6 @@ function enterApp(){
   document.getElementById('contactWaBtn').href = "https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent("Hi, I need help with my GrabNGo booking.");
   if(cartItems.length===0){ addItemRow(); }
   loadSettings();
-  initCarousel();
   showMainTab('home');
 }
 function logout(){
@@ -994,8 +985,7 @@ function renderPaymentSummary(){
 document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('dropoffDate').addEventListener('change', ()=>{});
   document.getElementById('pickupDate').addEventListener('change', ()=>{});
-  const pinInput = document.getElementById('pinInput');
-  pinInput.addEventListener('keydown', e=>{ if(e.key==='Enter') checkPin(); });
+  initCarousel();
   setLang('en');
 });
 
