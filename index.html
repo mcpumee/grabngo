@@ -184,9 +184,7 @@
   .access-code-box{ margin-top:10px; background:linear-gradient(180deg,var(--ink-light),var(--ink)); color:var(--mustard); border-radius:8px; padding:12px; text-align:center; box-shadow:var(--sh-md); }
   .access-code-box .code{ font-family:'Space Mono',monospace; font-size:24px; letter-spacing:0.15em; font-weight:700; }
   .access-code-box .lbl{ font-size:10px; color:var(--paper); opacity:0.7; letter-spacing:0.08em; }
-  .release-box{ margin-top:14px; display:flex; gap:8px; }
-  .release-box input{ flex:1; padding:11px; border-radius:8px; border:1.5px solid var(--ink); font-family:'Space Mono',monospace; text-align:center; letter-spacing:0.2em; }
-  .release-box button{ background:var(--stamp); color:#fff; border:none; padding:0 16px; border-radius:8px; font-weight:700; cursor:pointer; }
+  .secret-code-note{ margin-top:12px; text-align:center; font-size:11.5px; color:var(--stamp); font-weight:600; background:var(--paper-dark); border-radius:8px; padding:8px 10px; }
 
   .tab-nav{ display:flex; gap:8px; margin:16px 0; }
   .tab-nav button{ flex:1; padding:10px; border-radius:8px; border:1.5px solid var(--ink); background:var(--paper-light); font-weight:700; font-size:12px; cursor:pointer; box-shadow:var(--sh-sm); transition:transform 0.1s ease;}
@@ -254,11 +252,11 @@
 <div id="auth-view">
   <div class="topbar">
     <div class="brand">🔒 GrabNGo</div>
-    <div class="lang-toggle">
-      <button class="lang-en-btn active" onclick="setLang('en')">EN</button>
-      <button class="lang-th-btn" onclick="setLang('th')">ไทย</button>
-      <button class="lang-zh-btn" onclick="setLang('zh')">中文</button>
-    </div>
+    <select id="langSelectAuth" class="currency-select" onchange="setLang(this.value)">
+      <option value="en">EN</option>
+      <option value="th">ไทย</option>
+      <option value="zh">中文</option>
+    </select>
   </div>
   <div class="wrap">
     <div class="carousel">
@@ -349,11 +347,11 @@
         <option value="SGD">🇸🇬 SGD</option>
         <option value="CNY">🇨🇳 CNY</option>
       </select>
-      <div class="lang-toggle">
-        <button class="lang-en-btn active" onclick="setLang('en')">EN</button>
-        <button class="lang-th-btn" onclick="setLang('th')">ไทย</button>
-        <button class="lang-zh-btn" onclick="setLang('zh')">中文</button>
-      </div>
+      <select id="langSelectApp" class="currency-select" onchange="setLang(this.value)">
+        <option value="en">EN</option>
+        <option value="th">ไทย</option>
+        <option value="zh">中文</option>
+      </select>
     </div>
   <div class="wrap">
 
@@ -600,6 +598,7 @@ const I18N = {
     receiptSub:"Booking Slip", receiptStatus:"BOOKED — UNPAID",
     rRef:"Reference", rSize:"Size / Mode", rDropoff:"Drop-off", rPickup:"Pickup", rPaid:"Paid",
     rLockerLbl:"YOUR LOCKER", rCodeLbl:"ACCESS CODE",
+    keepCodeSecretNote:"Keep this code private — only show it to staff when you collect your item.",
     payNowLabel:"PAY NOW TO CONFIRM", payNowText:"Your booking is only confirmed once payment is verified by our staff.",
     extraChargeLabel:"⚠ ADDITIONAL CHARGE", extraChargeDefaultReason:"Late pickup fee",
     penaltyNote:"Any late-pickup fee is settled when you collect your item.",
@@ -681,6 +680,7 @@ const I18N = {
     receiptSub:"ใบจอง", receiptStatus:"จองแล้ว — ยังไม่ชำระเงิน",
     rRef:"เลขอ้างอิง", rSize:"ขนาด/โหมด", rDropoff:"วันฝาก", rPickup:"วันรับ", rPaid:"ชำระเงินแล้ว",
     rLockerLbl:"ตู้ล็อกเกอร์ของคุณ", rCodeLbl:"รหัสเปิดตู้",
+    keepCodeSecretNote:"เก็บรหัสนี้เป็นความลับ — แสดงให้พนักงานดูตอนมารับสินค้าเท่านั้น",
     payNowLabel:"ชำระเงินเพื่อยืนยัน", payNowText:"การจองจะยืนยันก็ต่อเมื่อพนักงานตรวจสอบการชำระเงินแล้วเท่านั้น",
     extraChargeLabel:"⚠ ค่าใช้จ่ายเพิ่มเติม", extraChargeDefaultReason:"ค่าปรับรับสินค้าล่าช้า",
     penaltyNote:"ค่าปรับกรณีรับสินค้าล่าช้าจะชำระตอนมารับของ",
@@ -761,6 +761,7 @@ const I18N = {
     receiptSub:"预订凭条", receiptStatus:"已预订 — 未付款",
     rRef:"编号", rSize:"尺寸/模式", rDropoff:"存入日期", rPickup:"取件日期", rPaid:"付款状态",
     rLockerLbl:"您的柜号", rCodeLbl:"访问密码",
+    keepCodeSecretNote:"请对此密码保密——只有在领取物品时出示给工作人员即可。",
     payNowLabel:"立即付款以确认", payNowText:"付款经工作人员核实后，预订才正式生效。",
     extraChargeLabel:"⚠ 额外费用", extraChargeDefaultReason:"逾期取件费",
     penaltyNote:"逾期取件的额外费用将在您领取物品时结算。",
@@ -807,9 +808,10 @@ let itemRowCounter = 0;
 
 function setLang(l){
   currentLang = l;
-  document.querySelectorAll('.lang-en-btn').forEach(b=>b.classList.toggle('active', l==='en'));
-  document.querySelectorAll('.lang-th-btn').forEach(b=>b.classList.toggle('active', l==='th'));
-  document.querySelectorAll('.lang-zh-btn').forEach(b=>b.classList.toggle('active', l==='zh'));
+  const authSel = document.getElementById('langSelectAuth');
+  const appSel = document.getElementById('langSelectApp');
+  if(authSel) authSel.value = l;
+  if(appSel) appSel.value = l;
   document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = I18N[l][el.getAttribute('data-i18n')]; });
   document.querySelectorAll('[data-i18n-html]').forEach(el=>{ el.innerHTML = I18N[l][el.getAttribute('data-i18n-html')]; });
   document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.placeholder = I18N[l][el.getAttribute('data-i18n-ph')]; });
@@ -931,9 +933,6 @@ function getDisplayStatus(o){
     if(o.payment_claimed_at) return { label: I18N[currentLang].payVerifying, cls:'status-booked' };
     return { label: I18N[currentLang].statusAwaitingPayment, cls:'status-booked' };
   }
-  if(o.status === 'purchasing' || o.status === 'in_transit'){
-    return { label: I18N[currentLang].statusProcuring, cls:'status-purchasing' };
-  }
   const key = 'status' + o.status.charAt(0).toUpperCase() + o.status.slice(1);
   return { label: I18N[currentLang][key] || o.status, cls:'status-'+o.status };
 }
@@ -993,8 +992,7 @@ function buildBookingDetailHTML(o){
         <div class="lbl" style="margin-top:6px;" data-i18n="rCodeLbl">ACCESS CODE</div><div class="code">${o.access_code}</div>
         <div style="font-size:9px; color:#E88; margin-top:4px;">${expired ? '⚠ Code expired — see staff to reissue' : ''}</div>
       </div>
-      <div class="release-box"><input type="text" id="releaseCode-${o.ref}" placeholder="Access code" maxlength="6"><button onclick="event.stopPropagation(); releaseLockerFor('${o.ref}')" data-i18n="releaseBtn">Open</button></div>
-      <div class="track-msg" id="releaseMsg-${o.ref}"></div>`;
+      <div class="secret-code-note">🤫 <span data-i18n="keepCodeSecretNote">Keep this code private — only show it to staff when you collect your item.</span></div>`;
   }
   html += `</div>`;
 
@@ -1077,15 +1075,6 @@ async function claimExtraCharge(chargeId, ref){
     msg += (L ? "联系方式：" : "Contact: ") + (o.contact||"");
   }
   window.open("https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(msg), "_blank");
-  loadMyBookings();
-}
-
-async function releaseLockerFor(ref){
-  const code = document.getElementById('releaseCode-'+ref).value.trim();
-  const msgEl = document.getElementById('releaseMsg-'+ref);
-  const { data, error } = await sb.rpc('customer_release_locker', { p_ref: ref, p_access_code: code });
-  if(error || !data){ msgEl.textContent = I18N[currentLang].releaseErr; msgEl.style.color = "var(--stamp)"; return; }
-  msgEl.textContent = I18N[currentLang].releaseOk; msgEl.style.color = "#8FD9A8";
   loadMyBookings();
 }
 
