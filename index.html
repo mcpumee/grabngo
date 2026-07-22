@@ -104,6 +104,11 @@
   .item-toggle button{ flex:1; padding:7px; border-radius:6px; border:1.5px solid var(--ink); background:var(--paper); font-size:11px; font-weight:600; cursor:pointer;}
   .item-toggle button.active{ background:var(--mustard); }
   .item-row{ display:flex; gap:8px; margin-top:8px; }
+  .field-group{ margin-bottom:12px; }
+  .field-group:last-child{ margin-bottom:0; }
+  .field-group label{ display:block; font-size:12.5px; font-weight:700; color:var(--ink); margin-bottom:2px; }
+  .field-group .field-hint{ font-size:10.5px; opacity:0.6; margin-bottom:5px; line-height:1.3; }
+  .item-row .field-group{ flex:1; margin-bottom:0; }
   .item-row > div{ flex:1; }
   .add-item-btn{ width:100%; padding:12px; border:2px dashed var(--ink); border-radius:10px; background:none; font-weight:700; font-size:13px; color:var(--ink); cursor:pointer; margin-bottom:16px;}
 
@@ -205,10 +210,17 @@
   .carousel-dots{ position:absolute; bottom:8px; left:0; right:0; display:flex; justify-content:center; gap:6px; }
   .carousel-dots .dot2{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.5); }
   .carousel-dots .dot2.active{ background:#fff; }
-  .booking-card{ background:var(--paper-light); border:1.5px solid var(--ink); border-radius:10px; padding:12px 14px; margin-bottom:10px; box-shadow:var(--sh-sm); cursor:pointer; }
+  .booking-card{ background:var(--paper-light); border:1.5px solid var(--ink); border-radius:10px; padding:12px 14px; margin-bottom:0; box-shadow:var(--sh-sm); cursor:pointer; }
   .booking-card .top-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
   .booking-card .ref{ font-family:'Space Mono',monospace; font-weight:700; color:var(--ink); font-size:13px; }
-  .booking-card .meta{ font-size:11.5px; opacity:0.7; }
+  .booking-card .meta{ font-size:11.5px; opacity:0.7; display:flex; justify-content:space-between; align-items:center; }
+  .booking-card .chevron{ transition:transform 0.25s ease; opacity:0.6; }
+  .booking-card.expanded .chevron{ transform:rotate(180deg); }
+  .booking-card-wrap{ margin-bottom:10px; }
+  .booking-detail{ max-height:0; overflow:hidden; transition:max-height 0.3s ease; background:var(--paper-light); border:1.5px solid var(--ink); border-top:none; border-radius:0 0 10px 10px; margin-top:-2px; }
+  .booking-detail.open{ max-height:900px; }
+  .booking-detail-inner{ padding:12px 14px 16px; }
+  .status-chip.status-paidwaiting{ background:#3F8F5A; }
   .wallet-balance-card{ background:linear-gradient(160deg,var(--ink-light),var(--ink)); border-radius:16px; padding:22px; text-align:center; box-shadow:var(--sh-lg); color:#fff; }
   .wallet-balance-label{ font-size:11px; letter-spacing:0.1em; opacity:0.75; margin-bottom:6px; }
   .wallet-balance-amount{ font-family:'Space Mono',monospace; font-size:34px; font-weight:700; color:#FFD9D6; }
@@ -470,35 +482,6 @@
       <div class="step-label" data-i18n="myBookingsLabel">MY BOOKINGS</div>
       <h2 class="step-title" data-i18n="myBookingsTitle">Your Bookings</h2>
       <div id="myBookingsList"><p style="font-size:12px; opacity:0.6;">Loading…</p></div>
-
-      <div id="track-result" class="hide" style="margin-top:16px;">
-        <div class="receipt locker-vents" id="track-receipt-capture">
-          <div class="receipt-head">
-            <div><div class="stencil">GrabNGo</div><div style="font-size:11px; opacity:0.6;" data-i18n="receiptSub">Booking Slip</div></div>
-            <span class="status-chip" id="t-status-chip">—</span>
-          </div>
-          <div class="receipt-row"><span class="k" data-i18n="rRef">Reference</span><span class="v mono" id="t-ref">—</span></div>
-          <div class="receipt-row"><span class="k" data-i18n="rSize">Size / Mode</span><span class="v" id="t-size">—</span></div>
-          <div class="receipt-row"><span class="k" data-i18n="rDropoff">Drop-off</span><span class="v" id="t-dropoff">—</span></div>
-          <div class="receipt-row"><span class="k" data-i18n="rPickup">Pickup</span><span class="v" id="t-pickup">—</span></div>
-          <div class="receipt-row"><span class="k" data-i18n="rPaid">Paid</span><span class="v" id="t-paid">—</span></div>
-          <div id="t-locker-wrap" class="hide">
-            <div class="access-code-box">
-              <div class="lbl" data-i18n="rLockerLbl">YOUR LOCKER</div><div class="code" id="t-locker">—</div>
-              <div class="lbl" style="margin-top:6px;" data-i18n="rCodeLbl">ACCESS CODE</div><div class="code" id="t-code">••••••</div>
-              <div style="font-size:9px; color:#E88; margin-top:4px;" id="t-expiry"></div>
-            </div>
-          </div>
-          <div id="t-release-wrap" class="hide">
-            <div class="release-box"><input type="text" id="releaseCode" data-i18n-ph="releaseCodePh" placeholder="Access code" maxlength="6"><button onclick="releaseLocker()" data-i18n="releaseBtn">Open</button></div>
-            <div class="track-msg" id="releaseMsg"></div>
-          </div>
-        </div>
-        <div class="save-reminder">
-          <div class="save-reminder-text">📸 <span data-i18n="saveReminderText">Save this now — screenshot or download it so you don't lose your reference and code.</span></div>
-          <button class="btn dark" onclick="downloadSlip('track-receipt-capture','track')" data-i18n="downloadSlipBtn">⬇ Download as Image</button>
-        </div>
-      </div>
     </div>
 
     <!-- ===== MY WALLET ===== -->
@@ -588,7 +571,11 @@ const I18N = {
     step1Label:"STEP 1 — SEARCH ITEMS", step1Title:"What Do You Want?",
     itemModeLink:"Link/Search", itemModePhoto:"Photo",
     lblLinkField:"Product link (optional)", lblPhotoField:"Or upload a photo (optional)", lblDescField:"Description",
-    phQuery:"Paste a link or describe the item", phQty:"Qty", phDetails:"Details (color, size, etc.)", phEstPrice:"Est. price (optional)",
+    hintLinkField:"Paste a link from Shopee, Lazada, a store website, or anywhere else — whatever helps us find it.",
+    hintPhotoField:"No link handy? A photo of the item works just as well.",
+    hintDescField:"Color, size, model, or anything else that helps us pick the right one.",
+    lblQtyField:"Quantity", lblEstPriceField:"Estimated price (optional)",
+    phQuery:"Paste a link or describe the item", phQty:"e.g. 1", phDetails:"Details (color, size, etc.)", phEstPrice:"For your own reference",
     addItemBtn:"+ Add Another Item", nextStep2:"Next: Choose Locker →",
     step2Label:"STEP 2 — CHOOSE YOUR LOCKER", step2Title:"Size & Storage Mode",
     lblSize:"Locker size", lblTemp:"Storage mode",
@@ -638,6 +625,7 @@ const I18N = {
     multiMatchTitle:"Found several bookings — tap one to view it:",
     trackNotFound:"No booking found with that reference.", trackEmpty:"Please enter your reference number.",
     statusBooked:"BOOKED", statusPurchasing:"PURCHASING", statusIn_transit:"IN TRANSIT", statusWe_collected:"WE COLLECTED IT", statusStored:"PACKED & IN LOCKER", statusCollected:"COLLECTED",
+    statusAwaitingPayment:"AWAITING PAYMENT", statusPaidWaiting:"PAID", statusProcuring:"PROCURING",
     releaseCodePh:"Access code", releaseBtn:"Open",
     releaseOk:"Locker opened — please collect your item now.",
     releaseErr:"Incorrect code, expired, or not in storage yet.",
@@ -662,7 +650,11 @@ const I18N = {
     step1Label:"第一步 — 搜索商品", step1Title:"您想要什么？",
     itemModeLink:"链接/搜索", itemModePhoto:"照片",
     lblLinkField:"商品链接（可选）", lblPhotoField:"或上传照片（可选）", lblDescField:"描述",
-    phQuery:"粘贴链接或描述商品", phQty:"数量", phDetails:"细节（颜色、尺寸等）", phEstPrice:"预估价格（可选）",
+    hintLinkField:"可以是 Shopee、Lazada、商店网站等任何链接——只要能帮我们找到商品即可。",
+    hintPhotoField:"没有链接也没关系，上传商品照片同样可以。",
+    hintDescField:"颜色、尺寸、型号或其他有助于我们找对商品的信息。",
+    lblQtyField:"数量", lblEstPriceField:"预估价格（可选）",
+    phQuery:"粘贴链接或描述商品", phQty:"例如 1", phDetails:"细节（颜色、尺寸等）", phEstPrice:"仅供您自己参考",
     addItemBtn:"+ 添加更多商品", nextStep2:"下一步：选择寄存柜 →",
     step2Label:"第二步 — 选择寄存柜", step2Title:"尺寸与存储模式",
     lblSize:"柜子尺寸", lblTemp:"存储模式",
@@ -712,6 +704,7 @@ const I18N = {
     multiMatchTitle:"找到多笔预订——点选查看：",
     trackNotFound:"找不到该编号对应的预订。", trackEmpty:"请输入您的编号。",
     statusBooked:"已预订", statusPurchasing:"正在购买", statusIn_transit:"正在配送", statusWe_collected:"已代取", statusStored:"已打包入柜", statusCollected:"已领取",
+    statusAwaitingPayment:"待付款", statusPaidWaiting:"已付款", statusProcuring:"正在采购",
     releaseCodePh:"访问密码", releaseBtn:"开柜",
     releaseOk:"寄存柜已打开——请立即领取您的物品。",
     releaseErr:"密码错误、已过期，或尚未入库。",
@@ -847,6 +840,19 @@ function carouselMove(dir){
 }
 
 /* ---------- my bookings (auto-list for the logged-in customer) ---------- */
+function getDisplayStatus(o){
+  if(o.status === 'booked'){
+    if(o.booking_paid) return { label: I18N[currentLang].statusPaidWaiting, cls:'status-paidwaiting' };
+    if(o.payment_claimed_at) return { label: I18N[currentLang].payVerifying, cls:'status-booked' };
+    return { label: I18N[currentLang].statusAwaitingPayment, cls:'status-booked' };
+  }
+  if(o.status === 'purchasing' || o.status === 'in_transit'){
+    return { label: I18N[currentLang].statusProcuring, cls:'status-purchasing' };
+  }
+  const key = 'status' + o.status.charAt(0).toUpperCase() + o.status.slice(1);
+  return { label: I18N[currentLang][key] || o.status, cls:'status-'+o.status };
+}
+
 async function loadMyBookings(){
   const listEl = document.getElementById('myBookingsList');
   if(!currentCustomer || !currentCustomer.id){
@@ -856,16 +862,106 @@ async function loadMyBookings(){
   const { data, error } = await sb.from('orders').select('*').eq('customer_id', currentCustomer.id).order('created_at', {ascending:false});
   if(error){ listEl.innerHTML = "Error: " + error.message; return; }
   if(!data || data.length===0){ listEl.innerHTML = `<p style="font-size:12px; opacity:0.65;">${currentLang==='zh' ? '暂无预订记录。':"You don't have any bookings yet."}</p>`; return; }
+  window._myBookingsData = data;
   listEl.innerHTML = "";
   data.forEach(o=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'booking-card-wrap';
+    const ds = getDisplayStatus(o);
     const card = document.createElement('div');
     card.className = 'booking-card';
-    const statusKey = 'status' + o.status.charAt(0).toUpperCase() + o.status.slice(1);
-    card.innerHTML = `<div class="top-row"><span class="ref">${o.ref}</span><span class="status-chip status-${o.status}">${I18N[currentLang][statusKey]||o.status}</span></div>
-      <div class="meta">${o.locker_size||'—'}/${o.temp_mode||'—'} · ${o.dropoff_date||'?'} → ${o.pickup_date||'?'}</div>`;
-    card.onclick = ()=>{ displayTrackedOrder(o); document.getElementById('track-result').scrollIntoView({behavior:'smooth'}); };
-    listEl.appendChild(card);
+    card.id = 'card-' + o.ref;
+    card.innerHTML = `<div class="top-row"><span class="ref">${o.ref}</span><span class="status-chip ${ds.cls}">${ds.label}</span></div>
+      <div class="meta"><span>${o.locker_size||'—'}/${o.temp_mode||'—'} · ${o.dropoff_date||'?'} → ${o.pickup_date||'?'}</span><span class="chevron">▾</span></div>`;
+    card.onclick = ()=>toggleBookingDetail(o.ref);
+    wrap.appendChild(card);
+
+    const detail = document.createElement('div');
+    detail.className = 'booking-detail';
+    detail.id = 'detail-' + o.ref;
+    detail.innerHTML = buildBookingDetailHTML(o);
+    wrap.appendChild(detail);
+
+    listEl.appendChild(wrap);
   });
+}
+
+function buildBookingDetailHTML(o){
+  const L = currentLang === 'zh';
+  let html = `<div class="booking-detail-inner">
+    <div class="receipt locker-vents" id="capture-${o.ref}">
+      <div class="receipt-row"><span class="k" data-i18n="rSize">Size / Mode</span><span class="v">${o.locker_size||'—'} / ${o.temp_mode||'—'}</span></div>
+      <div class="receipt-row"><span class="k" data-i18n="rDropoff">Drop-off</span><span class="v">${o.dropoff_date||'—'}</span></div>
+      <div class="receipt-row"><span class="k" data-i18n="rPickup">Pickup</span><span class="v">${o.pickup_date||'—'}</span></div>
+      <div class="receipt-row"><span class="k" data-i18n="rPaid">Paid</span><span class="v">${o.booking_paid ? '✓' : '✗'}</span></div>`;
+
+  if(o.status === 'stored' && o.locker_id){
+    const expired = o.code_expires_at && new Date(o.code_expires_at) < new Date();
+    html += `<div class="access-code-box">
+        <div class="lbl" data-i18n="rLockerLbl">YOUR LOCKER</div><div class="code">${o.locker_id}</div>
+        <div class="lbl" style="margin-top:6px;" data-i18n="rCodeLbl">ACCESS CODE</div><div class="code">${o.access_code}</div>
+        <div style="font-size:9px; color:#E88; margin-top:4px;">${expired ? '⚠ Code expired — see staff to reissue' : ''}</div>
+      </div>
+      <div class="release-box"><input type="text" id="releaseCode-${o.ref}" placeholder="Access code" maxlength="6"><button onclick="event.stopPropagation(); releaseLockerFor('${o.ref}')" data-i18n="releaseBtn">Open</button></div>
+      <div class="track-msg" id="releaseMsg-${o.ref}"></div>`;
+  }
+  html += `</div>`;
+
+  if(!o.booking_paid){
+    html += `<div class="summary-card" style="margin-top:12px;">
+      <h4 data-i18n="payNowLabel">PAY NOW TO CONFIRM</h4>
+      <div class="qr-box"><span>QR CODE</span></div>
+      <div style="display:flex; gap:8px;">
+        <input type="text" class="mono" readonly value="${o.ref}" style="flex:1; padding:11px; border-radius:8px; border:none; font-size:13px;">
+        <button class="btn small dark" style="width:auto; padding:0 16px;" onclick="event.stopPropagation(); claimPaymentForRef('${o.ref}')" data-i18n="markPaidBtn">I've Paid</button>
+      </div>
+      <div class="pay-status-msg" id="payMsg-${o.ref}">${o.payment_claimed_at ? I18N[currentLang].payMarkedOk : ''}</div>
+    </div>`;
+  }
+
+  html += `<div class="save-reminder" style="margin-top:12px;">
+    <div class="save-reminder-text">📸 <span data-i18n="saveReminderText">Save this now — screenshot or download it so you don't lose your reference and code.</span></div>
+    <button class="btn dark" onclick="event.stopPropagation(); downloadSlip('capture-${o.ref}','booking')" data-i18n="downloadSlipBtn">⬇ Download as Image</button>
+  </div></div>`;
+  return html;
+}
+
+function toggleBookingDetail(ref){
+  const card = document.getElementById('card-'+ref);
+  const detail = document.getElementById('detail-'+ref);
+  const isOpen = detail.classList.contains('open');
+  detail.classList.toggle('open', !isOpen);
+  card.classList.toggle('expanded', !isOpen);
+}
+
+async function claimPaymentForRef(ref){
+  const msgEl = document.getElementById('payMsg-'+ref);
+  const { error } = await sb.rpc('customer_claim_payment', { p_ref: ref });
+  if(error){ msgEl.textContent = I18N[currentLang].payMarkedErr; msgEl.style.color = "#E88"; return; }
+  msgEl.textContent = I18N[currentLang].payMarkedOk; msgEl.style.color = "#8FD9A8";
+
+  const o = (window._myBookingsData||[]).find(x=>x.ref===ref);
+  const L = currentLang === 'zh';
+  let msg = (L ? "预订付款声明（待核实）：\n" : "Booking payment claim (please verify):\n");
+  msg += (L ? "编号：" : "Ref: ") + ref + "\n";
+  if(o){
+    const days = (o.dropoff_date && o.pickup_date) ? Math.max(1, Math.round((new Date(o.pickup_date)-new Date(o.dropoff_date))/86400000)) : 1;
+    const amount = (o.daily_rate||0)*days + (o.full_service_fee||0);
+    msg += (L ? "应付金额：" : "Amount due: ") + "฿" + amount + "\n";
+    msg += (L ? "姓名：" : "Name: ") + (o.recipient||"") + "\n";
+    msg += (L ? "联系方式：" : "Contact: ") + (o.contact||"");
+  }
+  window.open("https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(msg), "_blank");
+  loadMyBookings();
+}
+
+async function releaseLockerFor(ref){
+  const code = document.getElementById('releaseCode-'+ref).value.trim();
+  const msgEl = document.getElementById('releaseMsg-'+ref);
+  const { data, error } = await sb.rpc('customer_release_locker', { p_ref: ref, p_access_code: code });
+  if(error || !data){ msgEl.textContent = I18N[currentLang].releaseErr; msgEl.style.color = "var(--stamp)"; return; }
+  msgEl.textContent = I18N[currentLang].releaseOk; msgEl.style.color = "#8FD9A8";
+  loadMyBookings();
 }
 
 /* ---------- my wallet (billing summary) ---------- */
@@ -948,15 +1044,34 @@ function renderItemRows(){
     div.innerHTML = `
       <span class="item-num">#${idx+1}</span>
       ${cartItems.length>1 ? `<button class="remove-item" onclick="removeItemRow(${it.id})">×</button>` : ''}
-      <label style="font-size:11px; font-weight:600; opacity:0.75; display:block; margin-bottom:3px;">${I18N[currentLang].lblLinkField}</label>
-      <input type="text" placeholder="${I18N[currentLang].phQuery}" value="${it.query||''}" oninput="updateItemField(${it.id},'query',this.value)">
-      <label style="font-size:11px; font-weight:600; opacity:0.75; display:block; margin:8px 0 3px;">${I18N[currentLang].lblPhotoField}</label>
-      <input type="file" accept="image/*" onchange="handleItemPhoto(${it.id}, this.files[0])">
-      <label style="font-size:11px; font-weight:600; opacity:0.75; display:block; margin:8px 0 3px;">${I18N[currentLang].lblDescField}</label>
-      <input type="text" placeholder="${I18N[currentLang].phDetails}" value="${it.details||''}" oninput="updateItemField(${it.id},'details',this.value)">
+
+      <div class="field-group">
+        <label>🔗 ${I18N[currentLang].lblLinkField}</label>
+        <p class="field-hint">${I18N[currentLang].hintLinkField}</p>
+        <input type="text" placeholder="${I18N[currentLang].phQuery}" value="${it.query||''}" oninput="updateItemField(${it.id},'query',this.value)">
+      </div>
+
+      <div class="field-group">
+        <label>📷 ${I18N[currentLang].lblPhotoField}</label>
+        <p class="field-hint">${I18N[currentLang].hintPhotoField}</p>
+        <input type="file" accept="image/*" onchange="handleItemPhoto(${it.id}, this.files[0])">
+      </div>
+
+      <div class="field-group">
+        <label>📝 ${I18N[currentLang].lblDescField}</label>
+        <p class="field-hint">${I18N[currentLang].hintDescField}</p>
+        <input type="text" placeholder="${I18N[currentLang].phDetails}" value="${it.details||''}" oninput="updateItemField(${it.id},'details',this.value)">
+      </div>
+
       <div class="item-row">
-        <div><input type="number" min="1" placeholder="${I18N[currentLang].phQty}" value="${it.qty}" oninput="updateItemField(${it.id},'qty',this.value)"></div>
-        <div><input type="number" min="0" placeholder="${I18N[currentLang].phEstPrice}" value="${it.estPrice||''}" oninput="updateItemField(${it.id},'estPrice',this.value)"></div>
+        <div class="field-group">
+          <label>🔢 ${I18N[currentLang].lblQtyField}</label>
+          <input type="number" min="1" placeholder="${I18N[currentLang].phQty}" value="${it.qty}" oninput="updateItemField(${it.id},'qty',this.value)">
+        </div>
+        <div class="field-group">
+          <label>💰 ${I18N[currentLang].lblEstPriceField}</label>
+          <input type="number" min="0" placeholder="${I18N[currentLang].phEstPrice}" value="${it.estPrice||''}" oninput="updateItemField(${it.id},'estPrice',this.value)">
+        </div>
       </div>
     `;
     container.appendChild(div);
@@ -1156,34 +1271,6 @@ async function confirmInlinePayment(evt){
 }
 
 /* ---------- track ---------- */
-function displayTrackedOrder(order){
-  const resultEl = document.getElementById('track-result');
-  document.getElementById('t-ref').textContent = order.ref;
-  document.getElementById('t-size').textContent = (order.locker_size||"—") + " / " + (order.temp_mode||"—");
-  document.getElementById('t-dropoff').textContent = order.dropoff_date || "—";
-  document.getElementById('t-pickup').textContent = order.pickup_date || "—";
-  document.getElementById('t-paid').textContent = order.booking_paid ? I18N[currentLang].payConfirmed : (order.payment_claimed_at ? I18N[currentLang].payVerifying : "✗");
-  const chip = document.getElementById('t-status-chip');
-  const statusKey = 'status' + order.status.charAt(0).toUpperCase() + order.status.slice(1);
-  chip.textContent = I18N[currentLang][statusKey] || order.status;
-  chip.className = "status-chip status-" + order.status;
-
-  const lockerWrap = document.getElementById('t-locker-wrap');
-  const releaseWrap = document.getElementById('t-release-wrap');
-  if(order.status === 'stored' && order.locker_id){
-    lockerWrap.classList.remove('hide');
-    document.getElementById('t-locker').textContent = order.locker_id;
-    document.getElementById('t-code').textContent = "••••••";
-    const expEl = document.getElementById('t-expiry');
-    if(order.code_expires_at){
-      const expired = new Date(order.code_expires_at) < new Date();
-      expEl.textContent = expired ? "⚠ Code expired — see staff to reissue" : "Valid until " + new Date(order.code_expires_at).toLocaleString();
-    }
-    releaseWrap.classList.remove('hide');
-  } else { lockerWrap.classList.add('hide'); releaseWrap.classList.add('hide'); }
-  resultEl.classList.remove('hide');
-}
-
 /* ---------- download booking slip as an image (so customers don't lose their ref/code) ---------- */
 async function downloadSlip(elementId, prefix){
   const el = document.getElementById(elementId);
@@ -1193,17 +1280,6 @@ async function downloadSlip(elementId, prefix){
   link.download = prefix + "-slip-" + Date.now() + ".png";
   link.href = canvas.toDataURL('image/png');
   link.click();
-}
-async function releaseLocker(){
-  const ref = document.getElementById('t-ref').textContent.trim();
-  const code = document.getElementById('releaseCode').value.trim();
-  const msgEl = document.getElementById('releaseMsg');
-  const { data, error } = await sb.rpc('customer_release_locker', { p_ref: ref, p_access_code: code });
-  if(error || !data){ msgEl.textContent = I18N[currentLang].releaseErr; msgEl.style.color = "var(--stamp)"; return; }
-  msgEl.textContent = I18N[currentLang].releaseOk; msgEl.style.color = "#8FD9A8";
-  const { data: refreshed } = await sb.from('orders').select('*').eq('ref', ref).maybeSingle();
-  if(refreshed) displayTrackedOrder(refreshed);
-  loadMyBookings();
 }
 
 /* ---------- admin ---------- */
