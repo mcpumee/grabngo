@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GrabNGo — Shop Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:wght@500;700;900&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FFFFFF; --paper-dark:#F7D9D6; --paper-light:#FFF3F2;
+    --ink:#8B1E1E; --ink-light:#B23A2E; --stamp:#D32F2F; --mustard:#E8746A; --teal:#A93226; --charcoal:#2A1414;
+    --sh-sm: 0 1px 2px rgba(139,30,30,0.14), 0 1px 1px rgba(139,30,30,0.08);
+    --sh-md: 0 4px 10px rgba(139,30,30,0.16), 0 2px 4px rgba(139,30,30,0.10);
+    --sh-lg: 6px 8px 0 rgba(139,30,30,0.16);
+    --sh-inset: inset 0 1px 3px rgba(139,30,30,0.14);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    background-image: radial-gradient(circle at 1px 1px, rgba(42,36,29,0.07) 1px, transparent 0);
+    background-size: 15px 15px;
+    color:var(--charcoal); font-family:'Work Sans','Noto Sans SC',sans-serif; line-height:1.5; font-size:15px; padding-bottom:20px;
+  }
+  .stencil{ font-family:'Big Shoulders Stencil', sans-serif; text-transform:uppercase; letter-spacing:0.02em; }
+  .mono{ font-family:'Space Mono', monospace; }
+  a{ color:inherit; text-decoration:none; }
+  .wrap{ max-width:480px; margin:0 auto; padding:0 18px 40px; }
+  .hide{ display:none !important; }
+
+  .topbar{ position:sticky; top:0; z-index:20; background:linear-gradient(180deg, var(--ink-light), var(--ink)); color:var(--paper); padding:12px 18px; display:flex; align-items:center; justify-content:space-between; box-shadow:var(--sh-md); }
+  .brand{ font-family:'Big Shoulders Stencil',sans-serif; font-size:20px; letter-spacing:0.03em; }
+  .lang-toggle{ display:flex; border:1.5px solid var(--mustard); border-radius:7px; overflow:hidden; font-size:12px; }
+  .lang-toggle button{ background:transparent; color:var(--paper); border:none; padding:6px 10px; font-weight:700; cursor:pointer; }
+  .lang-toggle button.active{ background:var(--mustard); color:var(--ink); }
+  .user-chip{ font-size:11px; opacity:0.8; display:flex; align-items:center; gap:6px; }
+  .user-chip button{ background:none; border:1px solid rgba(228,217,190,0.4); color:var(--paper); padding:3px 8px; border-radius:5px; font-size:10px; cursor:pointer; }
+
+  .field{ margin-bottom:12px; }
+  .field label{ display:block; font-size:12.5px; font-weight:600; margin-bottom:5px; color:var(--ink); }
+  .field input, .field textarea, .field select{ width:100%; padding:11px 13px; border-radius:8px; border:1.5px solid var(--ink); font-family:inherit; font-size:14px; background:var(--paper-light); color:var(--charcoal); box-shadow:var(--sh-inset); transition:box-shadow 0.15s ease, border-color 0.15s ease; }
+  .field input:focus, .field textarea:focus, .field select:focus{ outline:none; border-color:var(--mustard); box-shadow:var(--sh-inset), 0 0 0 3px rgba(214,164,65,0.25); }
+  .field input[type=file]{ padding:9px; font-size:12.5px; box-shadow:none; }
+
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; background:linear-gradient(180deg, #e0453f, var(--stamp)); color:#fff; border:none; padding:15px 20px; border-radius:10px; font-weight:700; font-size:15px; cursor:pointer; box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.25); transition:transform 0.08s ease, box-shadow 0.15s ease; }
+  .btn:active{ transform:translateY(1px); box-shadow:var(--sh-sm); }
+  .btn.dark{ background:linear-gradient(180deg, var(--ink-light), var(--ink)); color:var(--paper); }
+  .btn.outline{ background:var(--paper-light); color:var(--ink); border:2px solid var(--ink); box-shadow:var(--sh-sm); }
+  .btn.small{ padding:10px; font-size:13px; }
+  .btn:disabled{ opacity:0.5; cursor:default; transform:none; }
+
+  /* ===== AUTH VIEW ===== */
+  #auth-view{ padding:20px 0; }
+  .auth-hero{ text-align:center; margin-bottom:22px; background:var(--paper-light); border:1.5px solid var(--ink); border-radius:16px; padding:26px 20px 22px; box-shadow:var(--sh-lg); position:relative; }
+  .auth-hero h1{ font-size:30px; color:var(--ink); }
+  .auth-hero p{ font-size:13px; opacity:0.75; margin-top:6px;}
+  .stamp-badge{ display:inline-block; margin-top:14px; padding:6px 14px; border:2.5px solid var(--stamp); color:var(--stamp); font-weight:700; font-size:11px; letter-spacing:0.05em; border-radius:8px; transform:rotate(-3deg); box-shadow:var(--sh-sm); }
+  .auth-tabs{ display:flex; background:var(--paper-light); border:1.5px solid var(--ink); border-radius:10px; overflow:hidden; margin-bottom:18px; box-shadow:var(--sh-sm);}
+  .auth-tabs button{ flex:1; padding:11px; background:none; border:none; font-weight:700; font-size:13px; cursor:pointer; color:var(--ink); }
+  .auth-tabs button.active{ background:var(--ink); color:var(--paper); }
+  .social-row{ display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+  .social-btn{ display:flex; align-items:center; justify-content:center; gap:8px; padding:12px; border-radius:8px; border:1.5px solid var(--ink); background:var(--paper-light); font-weight:600; font-size:13px; cursor:not-allowed; opacity:0.55; position:relative; }
+  .social-btn .soon{ font-size:9px; background:var(--stamp); color:#fff; padding:2px 6px; border-radius:6px; margin-left:6px;}
+  .or-divider{ text-align:center; font-size:11px; opacity:0.5; margin:14px 0; }
+  .credentials-box{ background:linear-gradient(180deg,var(--ink-light),var(--ink)); color:var(--mustard); border-radius:10px; padding:16px; text-align:center; margin-top:14px; box-shadow:var(--sh-md); }
+  .credentials-box .row{ display:flex; justify-content:space-between; padding:6px 0; font-size:13px;}
+  .credentials-box .row .v{ font-family:'Space Mono',monospace; font-weight:700; font-size:16px;}
+  .credentials-box .warn{ font-size:11px; color:#E8B; margin-top:8px;}
+  .auth-msg{ font-size:12.5px; color:var(--stamp); min-height:16px; margin-bottom:8px;}
+
+  /* ===== STEP FLOW ===== */
+  .step-indicator{ display:flex; align-items:center; gap:6px; padding:16px 0 8px; }
+  .step-indicator .dot{ flex:1; height:5px; border-radius:3px; background:rgba(28,43,69,0.15); box-shadow:var(--sh-inset); }
+  .step-indicator .dot.active{ background:linear-gradient(90deg,#e8b95a,var(--mustard)); box-shadow:0 0 0 rgba(0,0,0,0); }
+  .step-indicator .dot.done{ background:var(--teal); box-shadow:0 0 0 rgba(0,0,0,0); }
+  .step-label{ font-size:11px; letter-spacing:0.1em; color:var(--stamp); font-weight:700; margin-bottom:4px;}
+  .step-title{ font-size:20px; color:var(--ink); margin-bottom:14px; }
+
+  /* item cart */
+  .item-card{ background:var(--paper-light); border:1.5px solid var(--ink); border-radius:10px; padding:14px; margin-bottom:12px; position:relative; box-shadow:var(--sh-md); border-top:3px solid var(--mustard); }
+  .item-card .item-num{ position:absolute; top:10px; right:12px; font-family:'Space Mono',monospace; font-size:11px; opacity:0.5;}
+  .item-card .remove-item{ position:absolute; top:8px; right:34px; background:none; border:none; color:var(--stamp); font-weight:700; font-size:16px; cursor:pointer; }
+  .item-toggle{ display:flex; gap:6px; margin-bottom:8px; }
+  .item-toggle button{ flex:1; padding:7px; border-radius:6px; border:1.5px solid var(--ink); background:var(--paper); font-size:11px; font-weight:600; cursor:pointer;}
+  .item-toggle button.active{ background:var(--mustard); }
+  .item-row{ display:flex; gap:8px; margin-top:8px; }
+  .item-row > div{ flex:1; }
+  .add-item-btn{ width:100%; padding:12px; border:2px dashed var(--ink); border-radius:10px; background:none; font-weight:700; font-size:13px; color:var(--ink); cursor:pointer; margin-bottom:16px;}
+
+  .size-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-bottom:6px; }
+  .size-opt{ border:1.5px solid var(--ink); border-radius:8px; padding:10px 4px; text-align:center; cursor:pointer; background:var(--paper-light); box-shadow:var(--sh-sm); transition:transform 0.1s ease, box-shadow 0.15s ease; }
+  .size-opt:active{ transform:translateY(1px); }
+  .size-opt.selected{ background:linear-gradient(180deg,#e8b95a,var(--mustard)); box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.35); transform:translateY(-1px); }
+  .size-opt strong{ display:block; font-size:13px; color:var(--ink); }
+  .size-opt .r{ font-family:'Space Mono',monospace; font-size:10px; color:var(--ink); opacity:0.75; margin-top:2px;}
+  .temp-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-bottom:6px; }
+  .temp-opt{ border:1.5px solid var(--ink); border-radius:8px; padding:10px 4px; text-align:center; cursor:pointer; background:var(--paper-light); box-shadow:var(--sh-sm); transition:transform 0.1s ease, box-shadow 0.15s ease; }
+  .temp-opt:active{ transform:translateY(1px); }
+  .temp-opt.selected{ background:linear-gradient(180deg,#3a8079,var(--teal)); color:#fff; box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.25); transform:translateY(-1px); }
+  .temp-opt strong{ display:block; font-size:11px; }
+  .temp-opt .r{ font-family:'Space Mono',monospace; font-size:9px; opacity:0.8; margin-top:2px;}
+  .field-row{ display:flex; gap:10px; }
+  .field-row .field{ flex:1; }
+
+  .summary-card{ background:linear-gradient(165deg,var(--ink-light),var(--ink)); color:var(--paper); border-radius:12px; padding:16px; margin-bottom:14px; box-shadow:var(--sh-md);}
+  .summary-card h4{ font-size:11px; letter-spacing:0.08em; color:var(--mustard); margin-bottom:10px;}
+  .summary-row{ display:flex; justify-content:space-between; font-size:13px; padding:5px 0; border-bottom:1px dotted rgba(228,217,190,0.15);}
+  .summary-row.total{ border-bottom:none; border-top:2px solid var(--mustard); margin-top:6px; padding-top:10px; font-weight:700; font-size:15px;}
+  .summary-row .v{ font-family:'Space Mono',monospace; }
+  .summary-note{ font-size:10.5px; opacity:0.65; margin-top:6px;}
+
+  .qr-box{ width:140px; height:140px; margin:14px auto; background:var(--paper); border-radius:10px; display:flex; align-items:center; justify-content:center; box-shadow:var(--sh-md);
+    background-image: linear-gradient(45deg, var(--ink) 25%, transparent 25%), linear-gradient(-45deg, var(--ink) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, var(--ink) 75%), linear-gradient(-45deg, transparent 75%, var(--ink) 75%);
+    background-size:16px 16px; background-position:0 0, 0 8px, 8px -8px, -8px 0; }
+  .qr-box span{ background:var(--paper); padding:4px 8px; font-size:10px; font-weight:700; color:var(--ink); border-radius:4px; font-family:'Space Mono',monospace;}
+  .pay-status-msg{ font-size:12px; margin-top:8px; min-height:16px;}
+
+  .btn-nav-row{ display:flex; gap:10px; margin-top:10px; }
+  .btn-nav-row .btn{ flex:1; }
+
+  #receipt-wrap{ margin-top:18px; }
+  .save-reminder{ background:var(--paper-dark); border:2px dashed var(--stamp); border-radius:10px; padding:12px; margin-top:10px; text-align:center; }
+  .save-reminder-text{ font-size:12px; color:var(--ink); margin-bottom:8px; font-weight:600; }
+  .match-card{ background:var(--paper-light); border:1.5px solid var(--ink); border-radius:10px; padding:12px 14px; margin-bottom:8px; cursor:pointer; box-shadow:var(--sh-sm); transition:transform 0.1s ease; }
+  .match-card:active{ transform:translateY(1px); }
+  .match-card .ref{ font-family:'Space Mono',monospace; font-weight:700; color:var(--ink); font-size:13px; }
+  .match-card .meta{ font-size:11.5px; opacity:0.7; margin-top:2px; }
+  .receipt{ background:var(--paper-light); border:2px solid var(--ink); border-radius:12px; padding:18px; box-shadow:var(--sh-lg); }
+  .receipt-head{ display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px dashed var(--ink); padding-bottom:10px; margin-bottom:10px;}
+  .receipt-head .stencil{ font-size:17px; color:var(--ink); }
+  .status-chip{ background:var(--stamp); color:#fff; font-size:10px; font-weight:700; padding:4px 9px; border-radius:20px; letter-spacing:0.04em; white-space:nowrap; box-shadow:var(--sh-sm);}
+  .receipt-row{ display:flex; justify-content:space-between; padding:4px 0; font-size:12.5px; }
+  .receipt-row .k{ opacity:0.65; } .receipt-row .v{ font-weight:600; font-family:'Space Mono',monospace; text-align:right; max-width:60%; }
+
+  footer{ text-align:center; padding:30px 0 10px; opacity:0.6; font-size:11px; }
+  .admin-dot{ cursor:default; padding:0 4px; }
+
+  #pin-modal{ position:fixed; inset:0; background:rgba(28,43,69,0.75); z-index:50; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .pin-box{ background:var(--paper-light); border-radius:14px; padding:24px; width:100%; max-width:280px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.4); }
+  .pin-title{ font-size:13px; font-weight:700; color:var(--ink); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:14px;}
+  #pinInput{ width:100%; padding:12px; border-radius:8px; border:1.5px solid var(--ink); font-size:18px; text-align:center; letter-spacing:0.3em; background:var(--paper); color:var(--ink); margin-bottom:8px; }
+  .pin-err{ color:var(--stamp); font-size:12px; min-height:16px; margin-bottom:8px; }
+  .pin-actions{ display:flex; gap:8px; }
+  .pin-actions button{ flex:1; padding:11px; border-radius:8px; border:none; font-weight:700; cursor:pointer; font-size:13px;}
+  .pin-cancel{ background:transparent; border:1.5px solid var(--ink) !important; color:var(--ink); }
+  .pin-submit{ background:var(--ink); color:var(--paper); }
+
+  .track-form{ display:flex; gap:8px; margin:14px 0; }
+  .track-form input{ flex:1; padding:12px 13px; border-radius:8px; border:1.5px solid var(--ink); background:var(--paper-light); font-family:'Space Mono',monospace; font-size:14px;}
+  .track-form button{ background:var(--ink); color:var(--paper); border:none; padding:0 18px; border-radius:8px; font-weight:700; cursor:pointer;}
+  .track-msg{ font-size:13px; color:var(--stamp); margin-bottom:10px; }
+  .status-chip.status-booked{ background:var(--stamp); }
+  .status-chip.status-stored{ background:var(--teal); }
+  .status-chip.status-collected{ background:#6B6156; }
+  .access-code-box{ margin-top:10px; background:linear-gradient(180deg,var(--ink-light),var(--ink)); color:var(--mustard); border-radius:8px; padding:12px; text-align:center; box-shadow:var(--sh-md); }
+  .access-code-box .code{ font-family:'Space Mono',monospace; font-size:24px; letter-spacing:0.15em; font-weight:700; }
+  .access-code-box .lbl{ font-size:10px; color:var(--paper); opacity:0.7; letter-spacing:0.08em; }
+  .release-box{ margin-top:14px; display:flex; gap:8px; }
+  .release-box input{ flex:1; padding:11px; border-radius:8px; border:1.5px solid var(--ink); font-family:'Space Mono',monospace; text-align:center; letter-spacing:0.2em; }
+  .release-box button{ background:var(--stamp); color:#fff; border:none; padding:0 16px; border-radius:8px; font-weight:700; cursor:pointer; }
+
+  .tab-nav{ display:flex; gap:8px; margin:16px 0; }
+  .tab-nav button{ flex:1; padding:10px; border-radius:8px; border:1.5px solid var(--ink); background:var(--paper-light); font-weight:700; font-size:12px; cursor:pointer; box-shadow:var(--sh-sm); transition:transform 0.1s ease;}
+  .tab-nav button:active{ transform:translateY(1px); }
+  .tab-nav button.active{ background:linear-gradient(180deg,var(--ink-light),var(--ink)); color:var(--paper); box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.15); }
+
+  #admin-view{ background:var(--charcoal); min-height:100vh; color:var(--paper); }
+  .admin-wrap{ max-width:560px; margin:0 auto; padding:20px 18px 60px; }
+  .admin-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;}
+  .admin-header h2{ font-family:'Big Shoulders Stencil',sans-serif; font-size:24px; color:var(--mustard); }
+  .back-btn{ background:none; border:1px solid rgba(228,217,190,0.4); color:var(--paper); padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer;}
+  .admin-card{ background:#3B1414; border-radius:12px; padding:18px; margin-bottom:18px; box-shadow:0 4px 14px rgba(0,0,0,0.35); border-top:3px solid var(--mustard); }
+  .admin-card h3{ font-size:15px; color:var(--mustard); margin-bottom:12px; }
+  .admin-form-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .admin-form-row input, .admin-form-row select{ flex:1; min-width:70px; padding:10px; border-radius:7px; border:none; font-size:13px; }
+  .admin-form-row button{ background:linear-gradient(180deg,#c24537,var(--stamp)); color:#fff; border:none; padding:10px 16px; border-radius:7px; font-weight:700; cursor:pointer; font-size:13px; box-shadow:var(--sh-sm);}
+  table{ width:100%; border-collapse:collapse; font-size:13px;}
+  th, td{ text-align:left; padding:8px 6px; border-bottom:1px solid rgba(228,217,190,0.15);}
+  th{ color:var(--mustard); font-size:11px; letter-spacing:0.05em; text-transform:uppercase;}
+  .del-btn{ background:none; border:none; color:#E88; cursor:pointer; font-size:12px; font-weight:700;}
+  .lbl-inline{ font-size:11px; opacity:0.6; display:block; margin-bottom:3px; }
+  .checkin-form{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px; padding:10px; background:#2E1010; border-radius:8px;}
+  .checkin-form label{ display:flex; align-items:center; gap:5px; font-size:11px; }
+  .checkin-result{ font-size:12px; color:var(--mustard); margin-top:6px; }
+  .paid-chip{ font-size:10px; font-weight:700; padding:2px 6px; border-radius:8px; }
+  .paid-chip.yes{ background:#2E6B63; color:#fff; } .paid-chip.no{ background:var(--stamp); color:#fff; }
+</style>
+
+<style>
+  body{ background:var(--charcoal); }
+  #login-screen{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .login-card{ background:var(--paper-light); border-radius:16px; padding:30px 26px; width:100%; max-width:320px; text-align:center; box-shadow:var(--sh-lg); }
+  .login-card .brand{ font-family:'Big Shoulders Stencil',sans-serif; font-size:26px; color:var(--ink); margin-bottom:4px; }
+  .login-card .sub{ font-size:12px; opacity:0.65; margin-bottom:18px; }
+  #pinInput{ width:100%; padding:14px; border-radius:8px; border:1.5px solid var(--ink); font-size:20px; text-align:center; letter-spacing:0.4em; background:#fff; color:var(--ink); margin-bottom:10px; box-shadow:var(--sh-inset); }
+  .pin-err{ color:var(--stamp); font-size:12px; min-height:16px; margin-bottom:10px; font-weight:600; }
+  .export-btn{ background:linear-gradient(180deg,#2e7d32,#1b5e20); color:#fff; border:none; padding:10px 16px; border-radius:7px; font-weight:700; cursor:pointer; font-size:13px; box-shadow:var(--sh-sm); }
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-card">
+    <div class="brand">GrabNGo</div>
+    <div class="sub">STAFF ACCESS ONLY</div>
+    <input type="password" id="pinInput" placeholder="Enter PIN" inputmode="numeric" maxlength="6">
+    <div class="pin-err" id="pinErr"></div>
+    <button class="btn dark" onclick="checkPin()">Unlock</button>
+  </div>
+</div>
+
+<div id="admin-view" class="hide">
+  <div class="admin-wrap">
+    <div class="admin-header"><h2>SHOP ADMIN</h2><button class="back-btn" onclick="logoutAdmin()">Log Out</button></div>
+
+    <div class="admin-card">
+      <h3>Rates &amp; Exchange Settings</h3>
+      <span class="lbl-inline">FX sell rate (THB per MYR)</span>
+      <div class="admin-form-row"><input type="number" step="0.01" id="setFx"></div>
+      <span class="lbl-inline">Size rates: S / M / L / XL (฿/day)</span>
+      <div class="admin-form-row"><input type="number" id="setSizeS"><input type="number" id="setSizeM"><input type="number" id="setSizeL"><input type="number" id="setSizeXL"></div>
+      <span class="lbl-inline">Storage mode add-on: Cold / Frozen (฿/day)</span>
+      <div class="admin-form-row"><input type="number" id="setTempCold"><input type="number" id="setTempFrozen"></div>
+      <span class="lbl-inline">Retrieval fee: small / medium / large (฿)</span>
+      <div class="admin-form-row"><input type="number" id="setRetSmall"><input type="number" id="setRetMed"><input type="number" id="setRetLarge"></div>
+      <span class="lbl-inline">Full service: base fee / free kg / coverage km / overage per kg (฿)</span>
+      <div class="admin-form-row"><input type="number" id="setFsBase"><input type="number" id="setFsFreeKg"><input type="number" id="setFsCoverageKm"><input type="number" id="setFsOveragePerKg"></div>
+      <div class="admin-form-row"><button onclick="saveSettings()" style="flex:0 0 100%;">Save Settings</button></div>
+      <div class="checkin-result" id="settingsMsg"></div>
+    </div>
+
+    <div class="admin-card">
+      <h3>Change Staff PIN</h3>
+      <div class="admin-form-row">
+        <input type="password" id="admOldPin" placeholder="Current PIN" inputmode="numeric" maxlength="6">
+        <input type="password" id="admNewPin" placeholder="New PIN" inputmode="numeric" maxlength="6">
+        <button onclick="changeAdminPin()">Update PIN</button>
+      </div>
+      <div id="pinChangeMsg" style="font-size:12px; min-height:16px;"></div>
+    </div>
+
+    <div class="admin-card">
+      <h3>Lockers</h3>
+      <table><thead><tr><th>ID</th><th>Size</th><th>Status</th><th>Ref</th></tr></thead><tbody id="lockersTableBody"></tbody></table>
+    </div>
+
+    <div class="admin-card">
+      <h3>Create Discount Code</h3>
+      <div class="admin-form-row">
+        <input type="text" id="admCode" placeholder="CODE"><input type="number" id="admPercent" placeholder="% off" min="1" max="100"><input type="text" id="admExpiry" placeholder="Expiry"><button onclick="addPromoCode()">+ Add</button>
+      </div>
+      <table><thead><tr><th>Code</th><th>Discount</th><th>Expires</th><th></th></tr></thead><tbody id="promoTableBody"></tbody></table>
+    </div>
+
+    <div class="admin-card">
+      <h3 style="display:flex; justify-content:space-between; align-items:center;">Bookings <button class="export-btn" onclick="exportBookingsToExcel()">⬇ Export to Excel</button></h3>
+      <table><thead><tr><th>Reference</th><th>Booking</th><th>Status / Action</th></tr></thead><tbody id="ordersTableBody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const SUPABASE_URL = "https://cimippgrdbaspqomimhf.supabase.co";
+const SUPABASE_KEY = "sb_publishable_OYST4lqvXzJEmABg6uknAA_BPzDP6RY";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let ADMIN_SESSION_PIN = null;
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  const pinInput = document.getElementById('pinInput');
+  pinInput.addEventListener('keydown', e=>{ if(e.key==='Enter') checkPin(); });
+  pinInput.focus();
+});
+
+async function checkPin(){
+  const val = document.getElementById('pinInput').value.trim();
+  const errEl = document.getElementById('pinErr');
+  errEl.textContent = "Checking\u2026";
+  const { data, error } = await sb.rpc('admin_verify', { pin: val });
+  if(error || !data){ errEl.textContent = "Incorrect PIN."; return; }
+  ADMIN_SESSION_PIN = val; errEl.textContent = "";
+  document.getElementById('login-screen').classList.add('hide');
+  document.getElementById('admin-view').classList.remove('hide');
+  renderPromoTable(); renderOrdersTable(); renderLockersTable(); loadSettingsIntoAdminForm();
+}
+function logoutAdmin(){
+  ADMIN_SESSION_PIN = null;
+  document.getElementById('admin-view').classList.add('hide');
+  document.getElementById('login-screen').classList.remove('hide');
+  document.getElementById('pinInput').value = "";
+}
+async function changeAdminPin(){
+  const oldPin = document.getElementById('admOldPin').value.trim();
+  const newPin = document.getElementById('admNewPin').value.trim();
+  const msgEl = document.getElementById('pinChangeMsg');
+  if(!oldPin || !newPin){ msgEl.textContent = "Enter both PINs."; msgEl.style.color = "var(--stamp)"; return; }
+  const { error } = await sb.rpc('admin_change_pin', { old_pin: oldPin, new_pin: newPin });
+  if(error){ msgEl.textContent = "Error: " + error.message; msgEl.style.color = "var(--stamp)"; return; }
+  ADMIN_SESSION_PIN = newPin;
+  document.getElementById('admOldPin').value=""; document.getElementById('admNewPin').value="";
+  msgEl.textContent = "PIN updated."; msgEl.style.color = "#8FD9A8";
+}
+async function loadSettingsIntoAdminForm(){
+  const { data } = await sb.from('settings').select('*').eq('id',1).maybeSingle();
+  if(!data) return;
+  document.getElementById('setFx').value = data.fx_sell_rate;
+  document.getElementById('setSizeS').value = data.size_s_rate;
+  document.getElementById('setSizeM').value = data.size_m_rate;
+  document.getElementById('setSizeL').value = data.size_l_rate;
+  document.getElementById('setSizeXL').value = data.size_xl_rate;
+  document.getElementById('setTempCold').value = data.temp_cold_addon;
+  document.getElementById('setTempFrozen').value = data.temp_frozen_addon;
+  document.getElementById('setRetSmall').value = data.retrieval_small;
+  document.getElementById('setRetMed').value = data.retrieval_medium;
+  document.getElementById('setRetLarge').value = data.retrieval_large;
+  document.getElementById('setFsBase').value = data.full_service_base_fee;
+  document.getElementById('setFsFreeKg').value = data.full_service_free_kg;
+  document.getElementById('setFsCoverageKm').value = data.full_service_coverage_km;
+  document.getElementById('setFsOveragePerKg').value = data.full_service_overage_per_kg;
+}
+async function saveSettings(){
+  const msgEl = document.getElementById('settingsMsg');
+  const { error } = await sb.rpc('admin_update_settings_v3', {
+    pin: ADMIN_SESSION_PIN,
+    p_fx_sell_rate: parseFloat(document.getElementById('setFx').value),
+    p_size_s: parseFloat(document.getElementById('setSizeS').value), p_size_m: parseFloat(document.getElementById('setSizeM').value),
+    p_size_l: parseFloat(document.getElementById('setSizeL').value), p_size_xl: parseFloat(document.getElementById('setSizeXL').value),
+    p_temp_cold: parseFloat(document.getElementById('setTempCold').value), p_temp_frozen: parseFloat(document.getElementById('setTempFrozen').value),
+    p_retrieval_small: parseFloat(document.getElementById('setRetSmall').value), p_retrieval_medium: parseFloat(document.getElementById('setRetMed').value), p_retrieval_large: parseFloat(document.getElementById('setRetLarge').value),
+    p_fs_base: parseFloat(document.getElementById('setFsBase').value), p_fs_free_kg: parseFloat(document.getElementById('setFsFreeKg').value),
+    p_fs_coverage_km: parseFloat(document.getElementById('setFsCoverageKm').value), p_fs_overage_per_kg: parseFloat(document.getElementById('setFsOveragePerKg').value)
+  });
+  if(error){ msgEl.textContent = "Error: " + error.message; msgEl.style.color = "var(--stamp)"; return; }
+  msgEl.textContent = "Settings saved."; msgEl.style.color = "#8FD9A8";
+}
+async function renderPromoTable(){
+  const body = document.getElementById('promoTableBody');
+  const { data, error } = await sb.from('promo_codes').select('*').order('created_at', {ascending:false});
+  body.innerHTML = "";
+  if(error){ body.innerHTML = `<tr><td colspan="4">Error: ${error.message}</td></tr>`; return; }
+  data.forEach(p=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="mono">${p.code}</td><td>${p.percent}%</td><td>${p.expiry || '—'}</td><td><button class="del-btn" onclick="removePromo('${p.code}')">Remove</button></td>`;
+    body.appendChild(tr);
+  });
+}
+async function addPromoCode(){
+  const code = document.getElementById('admCode').value.trim().toUpperCase();
+  const percent = parseInt(document.getElementById('admPercent').value);
+  const expiry = document.getElementById('admExpiry').value.trim() || null;
+  if(!code || !percent){ alert("Enter a code and a discount percentage."); return; }
+  const { error } = await sb.rpc('admin_add_promo', { pin: ADMIN_SESSION_PIN, p_code: code, p_percent: percent, p_expiry: expiry });
+  if(error){ alert("Error adding code: " + error.message); return; }
+  document.getElementById('admCode').value=""; document.getElementById('admPercent').value=""; document.getElementById('admExpiry').value="";
+  renderPromoTable();
+}
+async function removePromo(code){
+  const { error } = await sb.rpc('admin_remove_promo', { pin: ADMIN_SESSION_PIN, p_code: code });
+  if(error){ alert("Error removing code: " + error.message); return; }
+  renderPromoTable();
+}
+async function renderLockersTable(){
+  const body = document.getElementById('lockersTableBody');
+  const { data, error } = await sb.from('lockers').select('*').order('id');
+  body.innerHTML = "";
+  if(error){ body.innerHTML = `<tr><td colspan="4">Error: ${error.message}</td></tr>`; return; }
+  data.forEach(l=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="mono">${l.id}</td><td>${l.size}</td><td>${l.status}</td><td class="mono">${l.current_ref || '—'}</td>`;
+    body.appendChild(tr);
+  });
+}
+async function renderOrdersTable(){
+  const body = document.getElementById('ordersTableBody');
+  const { data, error } = await sb.from('orders').select('*').order('created_at', {ascending:false});
+  body.innerHTML = "";
+  if(error){ body.innerHTML = `<tr><td colspan="3">Error: ${error.message}</td></tr>`; return; }
+  for(const o of data){
+    const tr = document.createElement('tr');
+    const deliveryBadge = o.delivery_option === 'full_service'
+      ? `<br><span class="paid-chip" style="background:var(--stamp);">FULL SERVICE ฿${o.full_service_fee||0}</span><br><span style="opacity:0.6; font-size:10px;">${o.pickup_store_name||'?'} · ${o.est_weight_kg||'?'}kg</span>`
+      : `<br><span style="opacity:0.5; font-size:10px;">Self drop-off</span>`;
+    const bookingInfo = `${o.locker_size||'—'}/${o.temp_mode||'—'}<br><span style="opacity:0.6;">${o.dropoff_date||'?'} → ${o.pickup_date||'?'}</span><br><span class="paid-chip ${o.booking_paid?'yes':'no'}">${o.booking_paid?'PAID':'UNPAID'}</span>${deliveryBadge}<br><button class="del-btn" style="color:var(--mustard); margin-top:4px;" onclick="toggleItemsRow('${o.ref}')">View Full Details ▾</button>`;
+    let actionCell = `<span>${o.status}</span>`;
+    if(o.status === 'stored'){
+      actionCell = `<div>Locker ${o.locker_id}<br>Code: ${o.access_code}</div>
+        <div class="checkin-form"><input type="date" id="reissue-${o.ref}" style="grid-column:span 2;"><button onclick="reissueCode('${o.ref}')" style="grid-column:span 2;">Reissue Code (late)</button><div class="checkin-result" id="reissue-result-${o.ref}" style="grid-column:span 2;"></div></div>`;
+    } else if(o.status === 'booked' && o.booking_paid){
+      actionCell = `<div class="checkin-form"><select id="size-${o.ref}"><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option></select><label><input type="checkbox" id="retr-${o.ref}"> We collected it</label><button onclick="checkInOrder('${o.ref}')" style="grid-column:span 2;">Check In (item arrived)</button><div class="checkin-result" id="result-${o.ref}" style="grid-column:span 2;"></div></div>`;
+    } else if(o.status === 'booked' && !o.booking_paid && o.payment_claimed_at){
+      const claimedAgo = Math.round((Date.now() - new Date(o.payment_claimed_at).getTime())/60000);
+      actionCell = `<div class="checkin-form"><div style="grid-column:span 2; color:#D6A441; font-size:11px;">Customer claims paid — ${claimedAgo}m ago.</div><button onclick="confirmPayment('${o.ref}')" style="grid-column:span 2;">Confirm Payment Received</button><div class="checkin-result" id="confirm-result-${o.ref}" style="grid-column:span 2;"></div></div>`;
+    } else if(o.status === 'booked' && !o.booking_paid){
+      actionCell = `<span style="opacity:0.6;">Waiting for payment</span>`;
+    }
+    tr.innerHTML = `<td class="mono">${o.ref}</td><td style="font-size:11px;">${bookingInfo}</td><td>${actionCell}</td>`;
+    body.appendChild(tr);
+
+    const itemsTr = document.createElement('tr');
+    itemsTr.id = "items-row-" + o.ref;
+    itemsTr.className = "hide";
+    itemsTr.innerHTML = `<td colspan="3" style="background:#241010; font-size:11px;"><div id="items-content-${o.ref}">Loading…</div></td>`;
+    body.appendChild(itemsTr);
+  }
+}
+async function toggleItemsRow(ref){
+  const row = document.getElementById('items-row-'+ref);
+  const isHidden = row.classList.contains('hide');
+  row.classList.toggle('hide');
+  if(isHidden){
+    const contentEl = document.getElementById('items-content-'+ref);
+    contentEl.innerHTML = "Loading…";
+    const [{ data: order, error: orderErr }, { data: items, error: itemsErr }] = await Promise.all([
+      sb.from('orders').select('*').eq('ref', ref).maybeSingle(),
+      sb.from('order_items').select('*').eq('order_ref', ref).order('created_at')
+    ]);
+    if(orderErr || !order){ contentEl.innerHTML = "Could not load booking details."; return; }
+    let html = `<div style="padding:8px 0; border-bottom:2px dashed rgba(228,217,190,0.2); margin-bottom:6px;">
+      <b style="color:var(--mustard);">CUSTOMER</b><br>
+      Name: ${order.recipient || '—'}<br>
+      WhatsApp: ${order.contact || '—'}<br>
+      ${order.courier_tracking ? 'Courier tracking: '+order.courier_tracking+'<br>' : ''}
+      ${order.photo_url ? `<a href="${order.photo_url}" target="_blank" style="color:var(--mustard);">Order photo</a><br>` : ''}
+    </div>`;
+    html += `<div style="padding:8px 0; border-bottom:2px dashed rgba(228,217,190,0.2); margin-bottom:6px;">
+      <b style="color:var(--mustard);">DELIVERY</b><br>`;
+    if(order.delivery_option === 'full_service'){
+      html += `Full Service — we collect<br>
+        Store: ${order.pickup_store_name || '—'}<br>
+        Address: ${order.pickup_store_address || '—'}<br>
+        Est. weight: ${order.est_weight_kg || '—'} kg<br>
+        Full-service fee: ฿${order.full_service_fee || 0}<br>`;
+    } else {
+      html += `Customer drop-off (self-arranged)<br>`;
+    }
+    html += `</div>`;
+    html += `<div><b style="color:var(--mustard);">ITEMS REQUESTED</b><br>`;
+    if(itemsErr || !items || items.length===0){
+      html += "No item details recorded.";
+    } else {
+      html += items.map((it,i)=>`
+        <div style="padding:6px 0; border-bottom:1px dotted rgba(228,217,190,0.15);">
+          <b>#${i+1}</b> ${it.query_text ? 'Link/Search: '+it.query_text+'<br>' : ''}
+          ${it.image_url ? `<a href="${it.image_url}" target="_blank" style="color:var(--mustard);">Photo</a><br>` : ''}
+          Qty: ${it.quantity} ${it.details ? '· Notes: '+it.details : ''} ${it.estimated_price ? '· Est: ฿'+it.estimated_price : ''}
+        </div>`).join('');
+    }
+    html += `</div>`;
+    contentEl.innerHTML = html;
+  }
+}
+async function confirmPayment(ref){
+  const resultEl = document.getElementById('confirm-result-'+ref);
+  const { error } = await sb.rpc('admin_confirm_payment', { pin: ADMIN_SESSION_PIN, p_ref: ref });
+  if(error){ resultEl.textContent = "Error: " + error.message; resultEl.style.color = "#E88"; return; }
+  resultEl.textContent = "Payment confirmed."; resultEl.style.color = "#8FD9A8";
+  renderOrdersTable();
+}
+async function checkInOrder(ref){
+  const size = document.getElementById('size-'+ref).value;
+  const usedRetrieval = document.getElementById('retr-'+ref).checked;
+  const resultEl = document.getElementById('result-'+ref);
+  const { data, error } = await sb.rpc('admin_check_in_booking', { pin: ADMIN_SESSION_PIN, p_ref: ref, p_used_retrieval: usedRetrieval, p_parcel_size: size });
+  if(error){ resultEl.textContent = "Error: " + error.message; resultEl.style.color = "#E88"; return; }
+  resultEl.textContent = "Locker " + data.split(':')[0] + " — code " + data.split(':')[1];
+  resultEl.style.color = "#8FD9A8";
+  renderOrdersTable(); renderLockersTable();
+}
+async function reissueCode(ref){
+  const newDate = document.getElementById('reissue-'+ref).value;
+  const resultEl = document.getElementById('reissue-result-'+ref);
+  if(!newDate){ resultEl.textContent = "Pick a new pickup date first."; resultEl.style.color = "#E88"; return; }
+  const { data, error } = await sb.rpc('admin_reissue_code', { pin: ADMIN_SESSION_PIN, p_ref: ref, p_new_pickup_date: newDate });
+  if(error){ resultEl.textContent = "Error: " + error.message; resultEl.style.color = "#E88"; return; }
+  resultEl.textContent = "New code: " + data; resultEl.style.color = "#8FD9A8";
+  renderOrdersTable();
+}
+
+/* ---------- Export bookings to a real Excel file (.xlsx) ---------- */
+async function exportBookingsToExcel(){
+  const { data: orders, error } = await sb.from('orders').select('*').order('created_at', {ascending:false});
+  if(error || !orders){ alert("Error loading bookings: " + (error?.message||"unknown")); return; }
+  const { data: items } = await sb.from('order_items').select('*');
+
+  const bookingRows = orders.map(o => ({
+    Reference: o.ref,
+    Status: o.status,
+    Recipient: o.recipient,
+    WhatsApp: o.contact,
+    "Locker Size": o.locker_size,
+    "Storage Mode": o.temp_mode,
+    "Drop-off Date": o.dropoff_date,
+    "Pickup Date": o.pickup_date,
+    "Daily Rate": o.daily_rate,
+    "Booking Paid": o.booking_paid ? "Yes" : "No",
+    "Payment Claimed At": o.payment_claimed_at || "",
+    "Delivery Option": o.delivery_option,
+    "Pickup Store": o.pickup_store_name || "",
+    "Pickup Store Address": o.pickup_store_address || "",
+    "Est. Weight (kg)": o.est_weight_kg || "",
+    "Full Service Fee": o.full_service_fee || "",
+    "Locker ID": o.locker_id || "",
+    "Access Code": o.access_code || "",
+    "Courier Tracking": o.courier_tracking || "",
+    "Created At": o.created_at
+  }));
+
+  const itemRows = (items||[]).map(it => ({
+    "Order Ref": it.order_ref,
+    "Link/Search": it.query_text || "",
+    "Photo URL": it.image_url || "",
+    Quantity: it.quantity,
+    Details: it.details || "",
+    "Estimated Price": it.estimated_price || ""
+  }));
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(bookingRows), "Bookings");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(itemRows), "Item Details");
+  XLSX.writeFile(wb, "grabngo-bookings-" + new Date().toISOString().slice(0,10) + ".xlsx");
+}
+</script>
+</body>
+</html>
