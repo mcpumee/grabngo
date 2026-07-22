@@ -600,6 +600,7 @@ const I18N = {
     rRef:"Reference", rSize:"Size / Mode", rDropoff:"Drop-off", rPickup:"Pickup", rPaid:"Paid",
     rLockerLbl:"YOUR LOCKER", rCodeLbl:"ACCESS CODE",
     payNowLabel:"PAY NOW TO CONFIRM", payNowText:"Your booking is only confirmed once payment is verified by our staff.",
+    extraChargeLabel:"⚠ ADDITIONAL CHARGE", extraChargeDefaultReason:"Late pickup fee",
     penaltyNote:"Any late-pickup fee is settled when you collect your item.",
     markPaidBtn:"I've Paid",
     payMarkedOk:"Thanks — we've received your payment claim. Our staff will verify (about 5–10 minutes).",
@@ -679,6 +680,7 @@ const I18N = {
     rRef:"编号", rSize:"尺寸/模式", rDropoff:"存入日期", rPickup:"取件日期", rPaid:"付款状态",
     rLockerLbl:"您的柜号", rCodeLbl:"访问密码",
     payNowLabel:"立即付款以确认", payNowText:"付款经工作人员核实后，预订才正式生效。",
+    extraChargeLabel:"⚠ 额外费用", extraChargeDefaultReason:"逾期取件费",
     penaltyNote:"逾期取件的额外费用将在您领取物品时结算。",
     markPaidBtn:"我已付款",
     payMarkedOk:"谢谢——我们已收到您的付款声明。工作人员将进行核实（约5-10分钟）。",
@@ -863,6 +865,12 @@ async function loadMyBookings(){
   if(error){ listEl.innerHTML = "Error: " + error.message; return; }
   if(!data || data.length===0){ listEl.innerHTML = `<p style="font-size:12px; opacity:0.65;">${currentLang==='zh' ? '暂无预订记录。':"You don't have any bookings yet."}</p>`; return; }
   window._myBookingsData = data;
+
+  const refs = data.map(o=>o.ref);
+  const { data: charges } = await sb.from('extra_charges').select('*').in('order_ref', refs).order('created_at', {ascending:false});
+  window._myChargesMap = {};
+  (charges||[]).forEach(c=>{ (window._myChargesMap[c.order_ref] = window._myChargesMap[c.order_ref] || []).push(c); });
+
   listEl.innerHTML = "";
   data.forEach(o=>{
     const wrap = document.createElement('div');
@@ -919,6 +927,20 @@ function buildBookingDetailHTML(o){
     </div>`;
   }
 
+  const charges = (window._myChargesMap && window._myChargesMap[o.ref]) || [];
+  charges.filter(c=>c.status !== 'confirmed').forEach(c=>{
+    html += `<div class="summary-card" style="margin-top:12px; border:2px solid var(--stamp);">
+      <h4 data-i18n="extraChargeLabel">⚠ ADDITIONAL CHARGE</h4>
+      <p style="font-size:12.5px; opacity:0.85; margin-bottom:8px;">${c.reason || I18N[currentLang].extraChargeDefaultReason} — ฿${c.amount}</p>
+      <div class="qr-box"><span>QR CODE</span></div>
+      <div style="display:flex; gap:8px;">
+        <input type="text" class="mono" readonly value="${c.id.slice(0,8).toUpperCase()}" style="flex:1; padding:11px; border-radius:8px; border:none; font-size:13px;">
+        <button class="btn small dark" style="width:auto; padding:0 16px;" onclick="event.stopPropagation(); claimExtraCharge('${c.id}','${o.ref}')" data-i18n="markPaidBtn">I've Paid</button>
+      </div>
+      <div class="pay-status-msg" id="chargeMsg-${c.id}">${c.status==='claimed' ? I18N[currentLang].payMarkedOk : ''}</div>
+    </div>`;
+  });
+
   html += `<div class="save-reminder" style="margin-top:12px;">
     <div class="save-reminder-text">📸 <span data-i18n="saveReminderText">Save this now — screenshot or download it so you don't lose your reference and code.</span></div>
     <button class="btn dark" onclick="event.stopPropagation(); downloadSlip('capture-${o.ref}','booking')" data-i18n="downloadSlipBtn">⬇ Download as Image</button>
@@ -948,6 +970,26 @@ async function claimPaymentForRef(ref){
     const days = (o.dropoff_date && o.pickup_date) ? Math.max(1, Math.round((new Date(o.pickup_date)-new Date(o.dropoff_date))/86400000)) : 1;
     const amount = (o.daily_rate||0)*days + (o.full_service_fee||0);
     msg += (L ? "应付金额：" : "Amount due: ") + "฿" + amount + "\n";
+    msg += (L ? "姓名：" : "Name: ") + (o.recipient||"") + "\n";
+    msg += (L ? "联系方式：" : "Contact: ") + (o.contact||"");
+  }
+  window.open("https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(msg), "_blank");
+  loadMyBookings();
+}
+
+async function claimExtraCharge(chargeId, ref){
+  const msgEl = document.getElementById('chargeMsg-'+chargeId);
+  const { error } = await sb.rpc('customer_claim_extra_charge', { p_id: chargeId });
+  if(error){ msgEl.textContent = I18N[currentLang].payMarkedErr; msgEl.style.color = "#E88"; return; }
+  msgEl.textContent = I18N[currentLang].payMarkedOk; msgEl.style.color = "#8FD9A8";
+
+  const o = (window._myBookingsData||[]).find(x=>x.ref===ref);
+  const charge = ((window._myChargesMap||{})[ref]||[]).find(c=>c.id===chargeId);
+  const L = currentLang === 'zh';
+  let msg = (L ? "额外费用付款声明（待核实）：\n" : "Extra charge payment claim (please verify):\n");
+  msg += (L ? "编号：" : "Ref: ") + ref + "\n";
+  if(charge) msg += (L ? "金额：" : "Amount: ") + "฿" + charge.amount + "\n";
+  if(o){
     msg += (L ? "姓名：" : "Name: ") + (o.recipient||"") + "\n";
     msg += (L ? "联系方式：" : "Contact: ") + (o.contact||"");
   }
