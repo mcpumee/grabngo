@@ -256,6 +256,7 @@
     <div class="brand">🔒 GrabNGo</div>
     <div class="lang-toggle">
       <button class="lang-en-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-th-btn" onclick="setLang('th')">ไทย</button>
       <button class="lang-zh-btn" onclick="setLang('zh')">中文</button>
     </div>
   </div>
@@ -350,10 +351,10 @@
       </select>
       <div class="lang-toggle">
         <button class="lang-en-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-th-btn" onclick="setLang('th')">ไทย</button>
         <button class="lang-zh-btn" onclick="setLang('zh')">中文</button>
       </div>
     </div>
-  </div>
   <div class="wrap">
 
     <!-- ===== SEARCH ITEMS (booking flow) ===== -->
@@ -632,6 +633,87 @@ const I18N = {
     releaseErr:"Incorrect code, expired, or not in storage yet.",
     bookAlert:"Please add at least one item, choose size/mode/dates, and enter your name and WhatsApp number."
   },
+  th: {
+    authHero:"ช้อปฟรี<br>เราแพคให้<br>หยิบแล้วไป",
+    authSub:"สร้างบัญชีเพื่อจองล็อกเกอร์และติดตามพัสดุของคุณ",
+    noMarkupBadge:"✓ ไม่มีการบวกราคาสินค้า",
+    storesLabel:"บริการรับ-ส่งถึงร้านค้าเหล่านี้", storesMore:"+ ร้านค้าอื่นๆ",
+    tabLogin:"เข้าสู่ระบบ", tabSignup:"สมัครสมาชิก",
+    withGmail:"เข้าสู่ระบบด้วย Gmail", withLine:"เข้าสู่ระบบด้วย LINE",
+    orDivider:"— หรือใช้บัญชีของคุณ —",
+    lblUsername:"ชื่อผู้ใช้", phUsername:"ชื่อผู้ใช้ของคุณ", lblPassword:"รหัสผ่าน",
+    loginBtn:"เข้าสู่ระบบ", signupBtn:"สร้างบัญชี",
+    lblPhone:"เบอร์โทรศัพท์", phPhoneDigits:"12 3456789", lblFirstName:"ชื่อ", lblLastName:"นามสกุล",
+    lblChooseUsername:"ตั้งชื่อผู้ใช้", phChooseUsername:"เช่น tan_wei88",
+    lblChoosePassword:"ตั้งรหัสผ่าน", phChoosePassword:"อย่างน้อย 6 ตัวอักษร",
+    signupErr:"กรุณากรอกเบอร์โทร ชื่อ-นามสกุล และตั้งชื่อผู้ใช้กับรหัสผ่าน (6 ตัวขึ้นไป)",
+    loginErr:"ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง",
+    footer:"GrabNGo · บริการจองล็อกเกอร์และรับพัสดุ",
+    logoutBtn:"ออกจากระบบ", tabBook:"จอง", tabTrack:"ติดตาม",
+    step1Label:"ขั้นตอนที่ 1 — ค้นหาสินค้า", step1Title:"คุณต้องการอะไร?",
+    itemModeLink:"ลิงก์/ค้นหา", itemModePhoto:"รูปภาพ",
+    lblLinkField:"ลิงก์สินค้า (ไม่บังคับ)", lblPhotoField:"หรืออัปโหลดรูป (ไม่บังคับ)", lblDescField:"รายละเอียด",
+    hintLinkField:"วางลิงก์จาก Shopee, Lazada, เว็บร้านค้า หรือที่ไหนก็ได้ — ขอแค่ช่วยให้เราหาเจอ",
+    hintPhotoField:"ไม่มีลิงก์ก็ไม่เป็นไร ถ่ายรูปสินค้ามาก็ได้เหมือนกัน",
+    hintDescField:"สี ขนาด รุ่น หรืออะไรก็ตามที่ช่วยให้เราเลือกได้ถูกต้อง",
+    lblQtyField:"จำนวน", lblEstPriceField:"ราคาโดยประมาณ (ไม่บังคับ)",
+    phQuery:"วางลิงก์หรือบรรยายสินค้า", phQty:"เช่น 1", phDetails:"รายละเอียด (สี, ขนาด ฯลฯ)", phEstPrice:"สำหรับอ้างอิงของคุณเอง",
+    addItemBtn:"+ เพิ่มสินค้าอีกรายการ", nextStep2:"ถัดไป: เลือกล็อกเกอร์ →",
+    step2Label:"ขั้นตอนที่ 2 — เลือกล็อกเกอร์", step2Title:"ขนาดและโหมดจัดเก็บ",
+    lblSize:"ขนาดล็อกเกอร์", lblTemp:"โหมดจัดเก็บ",
+    lblDelivery:"สินค้าจะมาถึงเราอย่างไร?",
+    deliverySelf:"ฉันจะนำมาส่งเอง", deliverySelfNote:"ฟรี",
+    deliveryFull:"Full Service — ให้เราไปรับให้",
+    lblStoreName:"ชื่อร้านค้า", phStoreName:"เช่น ABC Electronics",
+    lblStoreAddress:"ที่อยู่ร้านค้า", phStoreAddress:"ที่อยู่หรือลิงก์แผนที่",
+    lblEstWeight:"น้ำหนักโดยประมาณ (กก.)",
+    fsFeeLabel:"ค่าบริการ Full Service (โดยประมาณ)",
+    fsFeeNote:"ราคาเริ่มต้น ฿100 ครอบคลุมไม่เกิน 5 กก. ในระยะ 50 กม. ส่วนเกินคิดเพิ่มกก.ละ ฿10 — ยืนยันจริงโดยพนักงานตอนรับสินค้า",
+    tempNormal:"ปกติ", tempCold:"เย็น 13°C", tempFrozen:"แช่แข็ง -2°C",
+    lblDropoff:"วันที่ฝากสินค้า", lblPickup:"วันที่รับสินค้า",
+    back:"← ย้อนกลับ", nextStep3:"ถัดไป: ชำระเงิน →",
+    step3Label:"ขั้นตอนที่ 3 — ชำระเงิน", step3Title:"ตรวจสอบและชำระเงิน",
+    itemsSummary:"รายการสินค้า (อ้างอิงเท่านั้น — ไม่คิดเงิน)",
+    itemsSummaryNote:"เราไม่คิดเงินค่าสินค้าเลย นี่เป็นแค่บันทึกของคุณเองว่าให้เราหาอะไร",
+    lockerFeeLabel:"ค่าล็อกเกอร์ (สิ่งที่คุณต้องจ่ายจริง)", sumDays:"จำนวนวัน", sumTotal:"ยอดที่ต้องจ่ายตอนนี้",
+    lblRecipient:"ชื่อของคุณ (สำหรับล็อกเกอร์)", lblContact:"เบอร์ WhatsApp", phContact:"+60...",
+    confirmBookBtn:"ยืนยันการจอง",
+    receiptSub:"ใบจอง", receiptStatus:"จองแล้ว — ยังไม่ชำระเงิน",
+    rRef:"เลขอ้างอิง", rSize:"ขนาด/โหมด", rDropoff:"วันฝาก", rPickup:"วันรับ", rPaid:"ชำระเงินแล้ว",
+    rLockerLbl:"ตู้ล็อกเกอร์ของคุณ", rCodeLbl:"รหัสเปิดตู้",
+    payNowLabel:"ชำระเงินเพื่อยืนยัน", payNowText:"การจองจะยืนยันก็ต่อเมื่อพนักงานตรวจสอบการชำระเงินแล้วเท่านั้น",
+    extraChargeLabel:"⚠ ค่าใช้จ่ายเพิ่มเติม", extraChargeDefaultReason:"ค่าปรับรับสินค้าล่าช้า",
+    penaltyNote:"ค่าปรับกรณีรับสินค้าล่าช้าจะชำระตอนมารับของ",
+    markPaidBtn:"ฉันจ่ายแล้ว",
+    payMarkedOk:"ขอบคุณครับ — เราได้รับการแจ้งชำระเงินแล้ว พนักงานจะตรวจสอบภายใน 5-10 นาที",
+    payMarkedErr:"เกิดข้อผิดพลาด กรุณาตรวจสอบและลองใหม่อีกครั้ง",
+    payVerifying:"กำลังตรวจสอบการชำระเงิน (5-10 นาที)", payConfirmed:"✓ ยืนยันแล้ว",
+    trackEyebrow:"ติดตามการจองของคุณ", trackTitle:"กรอกเลขอ้างอิง",
+    trackHint:"ต้องการค้นหาการจองของคนอื่นใช่ไหม? ค้นหาด้วยเลขอ้างอิงหรือชื่อด้านล่าง",
+    navSearch:"ค้นหาสินค้า", navBookings:"การจองของฉัน", navWallet:"รางวัลของฉัน", navContact:"ติดต่อแอดมิน",
+    carouselNote:"โปรโมชั่นและข่าวสารของร้านจะแสดงที่นี่",
+    homeWelcome:"ยินดีต้อนรับกลับ!", homeWelcomeSub:"ใช้ปุ่มด้านล่างเพื่อเริ่มต้นใช้งาน",
+    myBookingsLabel:"การจองของฉัน", myBookingsTitle:"รายการจองของคุณ",
+    walletLabel:"รางวัลของฉัน", walletTitle:"คะแนนและบิล",
+    walletPointsBigLabel:"คะแนนของคุณ", walletEarnRateNote:"รับ 10 คะแนนทุกๆ ฿100 ที่ใช้จ่าย",
+    walletRedeemLabel:"แลกคะแนนของคุณ", walletRedeemText:"ทักแชท WhatsApp เพื่อแลกคะแนนเป็นส่วนลดหรือของขวัญเล็กๆ น้อยๆ", walletRedeemBtn:"💬 แลกคะแนนผ่าน WhatsApp",
+    walletHistoryLabel:"ประวัติการทำรายการ",
+    walletTotalPaid:"ยอดที่จ่ายแล้ว (การจอง)", walletTotalPending:"รอการชำระเงิน",
+    contactLabel:"ติดต่อแอดมิน", contactTitle:"ต้องการความช่วยเหลือ?",
+    contactText:"ทักแชท WhatsApp หาเราได้โดยตรงหากมีคำถามเกี่ยวกับการจองของคุณ",
+    contactWaBtn:"💬 แชทผ่าน WhatsApp",
+    trackPh:"เช่น HHC-482913 หรือชื่อของคุณ", trackBtn:"ติดตาม",
+    saveReminderText:"บันทึกไว้ตอนนี้เลย — แคปหน้าจอหรือดาวน์โหลดเก็บไว้ กันลืมเลขอ้างอิงและรหัส",
+    downloadSlipBtn:"⬇ ดาวน์โหลดเป็นรูปภาพ",
+    multiMatchTitle:"พบการจองหลายรายการ — กดเพื่อดูรายละเอียด:",
+    trackNotFound:"ไม่พบการจองด้วยเลขอ้างอิงนี้", trackEmpty:"กรุณากรอกเลขอ้างอิงของคุณ",
+    statusBooked:"จองแล้ว", statusPurchasing:"กำลังซื้อ", statusIn_transit:"กำลังนำส่ง", statusWe_collected:"ร้านรับของแล้ว", statusStored:"แพคและเข้าล็อกเกอร์แล้ว", statusCollected:"รับของแล้ว",
+    statusAwaitingPayment:"รอการชำระเงิน", statusPaidWaiting:"ชำระเงินแล้ว", statusProcuring:"กำลังดำเนินการจัดหา",
+    releaseCodePh:"รหัสเปิดตู้", releaseBtn:"เปิดตู้",
+    releaseOk:"เปิดล็อกเกอร์แล้ว — กรุณารับสินค้าของคุณตอนนี้",
+    releaseErr:"รหัสไม่ถูกต้อง หมดอายุ หรือยังไม่เข้าล็อกเกอร์",
+    bookAlert:"กรุณาเพิ่มสินค้าอย่างน้อย 1 รายการ เลือกขนาด/โหมด/วันที่ และกรอกชื่อกับเบอร์ WhatsApp ของคุณ"
+  },
   zh: {
     authHero:"随心购物，<br>我们打包，<br>拿了就走。",
     authSub:"创建账户即可预订寄存柜并追踪您的物品。",
@@ -726,6 +808,7 @@ let itemRowCounter = 0;
 function setLang(l){
   currentLang = l;
   document.querySelectorAll('.lang-en-btn').forEach(b=>b.classList.toggle('active', l==='en'));
+  document.querySelectorAll('.lang-th-btn').forEach(b=>b.classList.toggle('active', l==='th'));
   document.querySelectorAll('.lang-zh-btn').forEach(b=>b.classList.toggle('active', l==='zh'));
   document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = I18N[l][el.getAttribute('data-i18n')]; });
   document.querySelectorAll('[data-i18n-html]').forEach(el=>{ el.innerHTML = I18N[l][el.getAttribute('data-i18n-html')]; });
