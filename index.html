@@ -19,10 +19,19 @@
   html{scroll-behavior:smooth;}
   body{
     background:var(--paper);
-    background-image: radial-gradient(circle at 1px 1px, rgba(42,36,29,0.07) 1px, transparent 0);
-    background-size: 15px 15px;
+    background-image: repeating-linear-gradient(180deg, rgba(139,30,30,0.035) 0px, rgba(139,30,30,0.035) 2px, transparent 2px, transparent 22px);
     color:var(--charcoal); font-family:'Work Sans','Noto Sans SC',sans-serif; line-height:1.5; font-size:15px; padding-bottom:20px;
   }
+  /* Locker-door vent strip — a reusable decorative top edge for cards, like a locker's ventilation slats */
+  .locker-vents::before, .summary-card::before, .wallet-balance-card::before, .booking-card::before{
+    content:""; display:block; height:8px; margin:-1px -1px 10px -1px;
+    background:repeating-linear-gradient(90deg, var(--ink) 0px, var(--ink) 3px, transparent 3px, transparent 9px);
+    border-radius:8px 8px 0 0; opacity:0.85;
+  }
+  .locker-vents, .summary-card, .wallet-balance-card, .booking-card{ position:relative; }
+  .summary-card::before{ background-image:repeating-linear-gradient(90deg, var(--paper) 0px, var(--paper) 3px, transparent 3px, transparent 9px); opacity:0.5; }
+  .wallet-balance-card::before{ background-image:repeating-linear-gradient(90deg, var(--paper) 0px, var(--paper) 3px, transparent 3px, transparent 9px); opacity:0.5; }
+  .lock-icon{ display:inline-flex; vertical-align:middle; }
   .stencil{ font-family:'Big Shoulders Stencil', sans-serif; text-transform:uppercase; letter-spacing:0.02em; }
   .mono{ font-family:'Space Mono', monospace; }
   a{ color:inherit; text-decoration:none; }
@@ -99,9 +108,11 @@
   .add-item-btn{ width:100%; padding:12px; border:2px dashed var(--ink); border-radius:10px; background:none; font-weight:700; font-size:13px; color:var(--ink); cursor:pointer; margin-bottom:16px;}
 
   .size-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-bottom:6px; }
-  .size-opt{ border:1.5px solid var(--ink); border-radius:8px; padding:10px 4px; text-align:center; cursor:pointer; background:var(--paper-light); box-shadow:var(--sh-sm); transition:transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.15s ease; }
+  .size-opt{ position:relative; border:1.5px solid var(--ink); border-radius:6px; padding:14px 4px 10px; text-align:center; cursor:pointer; background:var(--paper-light); background-image:repeating-linear-gradient(180deg, rgba(28,20,20,0.06) 0px, rgba(28,20,20,0.06) 1px, transparent 1px, transparent 6px); box-shadow:var(--sh-sm); transition:transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.15s ease; }
+  .size-opt::before{ content:""; position:absolute; top:5px; right:6px; width:4px; height:9px; border-radius:2px; background:var(--ink); opacity:0.6; }
   .size-opt:active{ transform:scale(0.94); }
-  .size-opt.selected{ background:linear-gradient(180deg,#e8b95a,var(--mustard)); box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.35); transform:translateY(-2px) scale(1.04); }
+  .size-opt.selected{ background-color:var(--mustard); background-image:repeating-linear-gradient(180deg, rgba(28,20,20,0.1) 0px, rgba(28,20,20,0.1) 1px, transparent 1px, transparent 6px); box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.35); transform:translateY(-2px) scale(1.04); }
+  .size-opt.selected::before{ background:var(--ink); opacity:0.85; }
   .size-opt strong{ display:block; font-size:13px; color:var(--ink); }
   .size-opt .r{ font-family:'Space Mono',monospace; font-size:10px; color:var(--ink); opacity:0.75; margin-top:2px;}
   .temp-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-bottom:6px; }
@@ -161,6 +172,8 @@
   .track-form button{ background:var(--ink); color:var(--paper); border:none; padding:0 18px; border-radius:8px; font-weight:700; cursor:pointer;}
   .track-msg{ font-size:13px; color:var(--stamp); margin-bottom:10px; }
   .status-chip.status-booked{ background:var(--stamp); }
+  .status-chip.status-purchasing{ background:#C97A3D; }
+  .status-chip.status-in_transit{ background:#8A6D3B; }
   .status-chip.status-stored{ background:var(--teal); }
   .status-chip.status-collected{ background:#6B6156; }
   .access-code-box{ margin-top:10px; background:linear-gradient(180deg,var(--ink-light),var(--ink)); color:var(--mustard); border-radius:8px; padding:12px; text-align:center; box-shadow:var(--sh-md); }
@@ -228,7 +241,7 @@
 <!-- ===================== AUTH VIEW ===================== -->
 <div id="auth-view">
   <div class="topbar">
-    <div class="brand">GrabNGo</div>
+    <div class="brand">🔒 GrabNGo</div>
     <div class="lang-toggle">
       <button class="lang-en-btn active" onclick="setLang('en')">EN</button>
       <button class="lang-zh-btn" onclick="setLang('zh')">中文</button>
@@ -259,8 +272,14 @@
     </div>
 
     <div class="social-row">
-      <div class="social-btn">🔴 <span data-i18n="withGmail">Continue with Gmail</span><span class="soon">SOON</span></div>
-      <div class="social-btn">🟢 <span data-i18n="withLine">Continue with LINE</span><span class="soon">SOON</span></div>
+      <div class="social-btn">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.9-2.26 5.36-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        <span data-i18n="withGmail">Continue with Gmail</span><span class="soon">SOON</span>
+      </div>
+      <div class="social-btn">
+        <svg width="18" height="18" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#06C755"/><path fill="#fff" d="M24 11c-7.73 0-14 5.13-14 11.46 0 5.67 4.98 10.42 11.71 11.32.46.1 1.08.31 1.24.71.14.36.09.93.05 1.3l-.2 1.2c-.06.36-.28 1.4 1.23.76 1.51-.63 8.14-4.79 11.1-8.2 2.05-2.25 3.03-4.53 3.03-7.09C38 16.13 31.73 11 24 11z"/><path fill="#06C755" d="M20.6 20.1h-1.2v6.1c0 .17-.13.3-.3.3h-.98a.3.3 0 01-.3-.3v-6.1h-1.2a.3.3 0 01-.3-.3v-.8c0-.16.13-.3.3-.3h3.98c.17 0 .3.14.3.3v.8c0 .17-.13.3-.3.3zm2.55 6.4h-.98a.3.3 0 01-.3-.3V19a.3.3 0 01.3-.3h.98c.17 0 .3.14.3.3v7.2c0 .17-.13.3-.3.3zm7.15 0h-.97a.3.3 0 01-.25-.13l-3.02-4.08v3.91c0 .17-.14.3-.3.3h-.98a.3.3 0 01-.3-.3V19a.3.3 0 01.3-.3h.97a.3.3 0 01.25.13l3.02 4.08V19c0-.16.14-.3.3-.3h.98c.17 0 .3.14.3.3v7.2c0 .17-.13.3-.3.3zm5.75-6.1h-2.9v1.2h2.5c.16 0 .3.14.3.3v.8c0 .17-.14.3-.3.3h-2.5v1.2h2.9c.17 0 .3.14.3.3v.8c0 .17-.13.3-.3.3h-4.18a.3.3 0 01-.3-.3V19a.3.3 0 01.3-.3h4.18c.17 0 .3.14.3.3v.8c0 .16-.13.3-.3.3z"/></svg>
+        <span data-i18n="withLine">Continue with LINE</span><span class="soon">SOON</span>
+      </div>
     </div>
     <div class="or-divider" data-i18n="orDivider">— or use your account —</div>
 
@@ -309,7 +328,7 @@
 <!-- ===================== BOOKING FLOW (logged-in) ===================== -->
 <div id="booking-view" class="hide">
   <div class="topbar">
-    <div class="brand" style="cursor:pointer;" onclick="showMainTab('search')">GrabNGo</div>
+    <div class="brand" style="cursor:pointer;" onclick="showMainTab('search')">🔒 GrabNGo</div>
       <div class="user-chip"><span id="userGreeting">—</span><button onclick="logout()" data-i18n="logoutBtn">Log Out</button></div>
       <select id="currencySelect" class="currency-select" onchange="setCurrency(this.value)">
         <option value="THB">🇹🇭 THB</option>
@@ -416,7 +435,7 @@
         </div>
 
         <div id="receipt-wrap" class="hide">
-          <div class="receipt" id="booking-receipt-capture">
+          <div class="receipt locker-vents" id="booking-receipt-capture">
             <div class="receipt-head">
               <div><div class="stencil">GrabNGo</div><div style="font-size:11px; opacity:0.6;" data-i18n="receiptSub">Booking Slip</div></div>
               <span class="status-chip status-booked" data-i18n="receiptStatus">BOOKED — UNPAID</span>
@@ -453,7 +472,7 @@
       <div id="myBookingsList"><p style="font-size:12px; opacity:0.6;">Loading…</p></div>
 
       <div id="track-result" class="hide" style="margin-top:16px;">
-        <div class="receipt" id="track-receipt-capture">
+        <div class="receipt locker-vents" id="track-receipt-capture">
           <div class="receipt-head">
             <div><div class="stencil">GrabNGo</div><div style="font-size:11px; opacity:0.6;" data-i18n="receiptSub">Booking Slip</div></div>
             <span class="status-chip" id="t-status-chip">—</span>
@@ -484,27 +503,19 @@
 
     <!-- ===== MY WALLET ===== -->
     <div id="tab-content-wallet" class="hide">
-      <div class="step-label" data-i18n="walletLabel">MY WALLET</div>
-      <h2 class="step-title" data-i18n="walletTitle">Billing Summary</h2>
+      <div class="step-label" data-i18n="walletLabel">MY REWARDS</div>
+      <h2 class="step-title" data-i18n="walletTitle">Points &amp; Billing</h2>
 
       <div class="wallet-balance-card">
-        <div class="wallet-balance-label" data-i18n="walletBalanceLabel">WALLET BALANCE</div>
-        <div class="wallet-balance-amount" id="walletBalanceAmount">฿0</div>
-        <div class="wallet-points-row">🏅 <span id="walletPoints">0</span> <span data-i18n="walletPointsLabel">points earned</span></div>
+        <div class="wallet-balance-label" data-i18n="walletPointsBigLabel">YOUR POINTS</div>
+        <div class="wallet-balance-amount" id="walletPoints">0</div>
+        <div class="wallet-points-row" data-i18n="walletEarnRateNote">Earn 10 points for every ฿100 you spend</div>
       </div>
 
-      <div class="summary-card" style="margin-top:14px;">
-        <h4 data-i18n="walletTopupLabel">TOP UP WALLET</h4>
-        <div class="field"><label data-i18n="walletTopupAmountLabel">Amount to top up (฿)</label><input type="number" id="topupAmount" min="1" style="color:var(--charcoal);"></div>
-        <button class="btn dark" onclick="requestTopup(event)" data-i18n="walletTopupBtn">Request Top-Up</button>
-        <div id="topupPayBox" class="hide" style="margin-top:14px;">
-          <div class="qr-box"><span>QR CODE</span></div>
-          <div style="display:flex; gap:8px;">
-            <input type="text" id="topupRefDisplay" class="mono" readonly style="flex:1; padding:11px; border-radius:8px; border:none; font-size:13px;">
-            <button class="btn small dark" style="width:auto; padding:0 16px;" onclick="confirmTopupPayment(event)" data-i18n="markPaidBtn">I've Paid</button>
-          </div>
-          <div class="pay-status-msg" id="topupPayMsg"></div>
-        </div>
+      <div class="summary-card" style="margin-top:14px; text-align:center;">
+        <h4 data-i18n="walletRedeemLabel">REDEEM YOUR POINTS</h4>
+        <p style="font-size:12.5px; opacity:0.85; margin-bottom:14px;" data-i18n="walletRedeemText">Message us on WhatsApp to redeem your points for a discount code or a small gift.</p>
+        <a class="btn dark" id="walletRedeemWaBtn" href="#" target="_blank" data-i18n="walletRedeemBtn">💬 Redeem via WhatsApp</a>
       </div>
 
       <div class="summary-card">
@@ -609,13 +620,13 @@ const I18N = {
     payVerifying:"VERIFYING PAYMENT (5–10 MIN)", payConfirmed:"✓ Confirmed",
     trackEyebrow:"TRACK YOUR BOOKING", trackTitle:"Enter Your Reference Number",
     trackHint:"Looking up a booking for someone else? Search by reference number or name below.",
-    navSearch:"Search Items", navBookings:"My Bookings", navWallet:"My Wallet", navContact:"Contact Admin",
+    navSearch:"Search Items", navBookings:"My Bookings", navWallet:"My Reward", navContact:"Contact Admin",
     carouselNote:"Shop promotions and updates will appear here.",
     homeWelcome:"Welcome back!", homeWelcomeSub:"Use the buttons below to get started.",
     myBookingsLabel:"MY BOOKINGS", myBookingsTitle:"Your Bookings",
-    walletLabel:"MY WALLET", walletTitle:"Billing Summary",
-    walletBalanceLabel:"WALLET BALANCE", walletPointsLabel:"points earned",
-    walletTopupLabel:"TOP UP WALLET", walletTopupAmountLabel:"Amount to top up (฿)", walletTopupBtn:"Request Top-Up",
+    walletLabel:"MY REWARDS", walletTitle:"Points & Billing",
+    walletPointsBigLabel:"YOUR POINTS", walletEarnRateNote:"Earn 10 points for every ฿100 you spend",
+    walletRedeemLabel:"REDEEM YOUR POINTS", walletRedeemText:"Message us on WhatsApp to redeem your points for a discount code or a small gift.", walletRedeemBtn:"💬 Redeem via WhatsApp",
     walletHistoryLabel:"TRANSACTION HISTORY",
     walletTotalPaid:"Total paid (bookings)", walletTotalPending:"Awaiting payment",
     contactLabel:"CONTACT ADMIN", contactTitle:"Need Help?",
@@ -626,7 +637,7 @@ const I18N = {
     downloadSlipBtn:"⬇ Download as Image",
     multiMatchTitle:"Found several bookings — tap one to view it:",
     trackNotFound:"No booking found with that reference.", trackEmpty:"Please enter your reference number.",
-    statusBooked:"BOOKED", statusWe_collected:"WE COLLECTED IT", statusStored:"IN STORAGE", statusCollected:"COLLECTED",
+    statusBooked:"BOOKED", statusPurchasing:"PURCHASING", statusIn_transit:"IN TRANSIT", statusWe_collected:"WE COLLECTED IT", statusStored:"PACKED & IN LOCKER", statusCollected:"COLLECTED",
     releaseCodePh:"Access code", releaseBtn:"Open",
     releaseOk:"Locker opened — please collect your item now.",
     releaseErr:"Incorrect code, expired, or not in storage yet.",
@@ -683,13 +694,13 @@ const I18N = {
     payVerifying:"核实付款中（5-10分钟）", payConfirmed:"✓ 已确认",
     trackEyebrow:"追踪您的预订", trackTitle:"输入您的编号",
     trackHint:"要查询别人的预订吗？请在下方用编号或姓名搜索。",
-    navSearch:"搜索商品", navBookings:"我的预订", navWallet:"我的钱包", navContact:"联系客服",
+    navSearch:"搜索商品", navBookings:"我的预订", navWallet:"我的奖励", navContact:"联系客服",
     carouselNote:"店铺优惠及最新消息将显示于此。",
     homeWelcome:"欢迎回来！", homeWelcomeSub:"请使用下方按钮开始使用。",
     myBookingsLabel:"我的预订", myBookingsTitle:"您的预订",
-    walletLabel:"我的钱包", walletTitle:"账单摘要",
-    walletBalanceLabel:"钱包余额", walletPointsLabel:"积分",
-    walletTopupLabel:"钱包充值", walletTopupAmountLabel:"充值金额（฿）", walletTopupBtn:"申请充值",
+    walletLabel:"我的奖励", walletTitle:"积分与账单",
+    walletPointsBigLabel:"您的积分", walletEarnRateNote:"每消费 ฿100 可获得 10 积分",
+    walletRedeemLabel:"兑换积分", walletRedeemText:"请通过 WhatsApp 联系我们，将积分兑换为优惠码或小礼物。", walletRedeemBtn:"💬 通过 WhatsApp 兑换",
     walletHistoryLabel:"交易记录",
     walletTotalPaid:"已付总额（预订）", walletTotalPending:"待付款总额",
     contactLabel:"联系客服", contactTitle:"需要帮助？",
@@ -700,7 +711,7 @@ const I18N = {
     downloadSlipBtn:"⬇ 下载为图片",
     multiMatchTitle:"找到多笔预订——点选查看：",
     trackNotFound:"找不到该编号对应的预订。", trackEmpty:"请输入您的编号。",
-    statusBooked:"已预订", statusWe_collected:"已代取", statusStored:"寄存中", statusCollected:"已领取",
+    statusBooked:"已预订", statusPurchasing:"正在购买", statusIn_transit:"正在配送", statusWe_collected:"已代取", statusStored:"已打包入柜", statusCollected:"已领取",
     releaseCodePh:"访问密码", releaseBtn:"开柜",
     releaseOk:"寄存柜已打开——请立即领取您的物品。",
     releaseErr:"密码错误、已过期，或尚未入库。",
@@ -742,6 +753,7 @@ async function doLogin(){
   const { data, error } = await sb.rpc('customer_login', { p_username: username, p_password: password });
   if(error || !data || data.length===0){ msgEl.textContent = I18N[currentLang].loginErr; return; }
   currentCustomer = data[0];
+  saveSession();
   msgEl.textContent = "";
   enterApp();
 }
@@ -759,8 +771,27 @@ async function doSignup(){
   if(error || !data || data.length===0){ msgEl.textContent = error ? error.message.replace('P0001: ','') : "Error creating account."; return; }
   msgEl.textContent = "";
   currentCustomer = { id: data[0].id, first_name:first, last_name:last, phone };
+  saveSession();
   enterApp();
 }
+
+/* ---------- persistent login (survives page refresh) ---------- */
+const SESSION_KEY = 'grabngo_session';
+function saveSession(){
+  try{ localStorage.setItem(SESSION_KEY, JSON.stringify(currentCustomer)); }catch(e){}
+}
+function restoreSession(){
+  try{
+    const raw = localStorage.getItem(SESSION_KEY);
+    if(!raw) return false;
+    currentCustomer = JSON.parse(raw);
+    return !!(currentCustomer && currentCustomer.id);
+  }catch(e){ return false; }
+}
+function clearSession(){
+  try{ localStorage.removeItem(SESSION_KEY); }catch(e){}
+}
+
 function enterApp(){
   document.getElementById('auth-view').classList.add('hide');
   document.getElementById('booking-view').classList.remove('hide');
@@ -774,6 +805,7 @@ function enterApp(){
 }
 function logout(){
   currentCustomer = null;
+  clearSession();
   document.getElementById('booking-view').classList.add('hide');
   document.getElementById('auth-view').classList.remove('hide');
 }
@@ -840,18 +872,19 @@ async function loadMyBookings(){
 async function loadWallet(){
   const listEl = document.getElementById('walletList');
   if(!currentCustomer || !currentCustomer.id){
-    listEl.innerHTML = `<p style="font-size:12px; opacity:0.65;">${currentLang==='zh' ? '请先登录以查看您的钱包。':'Please log in to see your wallet.'}</p>`;
+    listEl.innerHTML = `<p style="font-size:12px; opacity:0.65;">${currentLang==='zh' ? '请先登录以查看您的积分。':'Please log in to see your points.'}</p>`;
     document.getElementById('walletTotalPaid').textContent = "฿0";
     document.getElementById('walletTotalPending').textContent = "฿0";
-    document.getElementById('walletBalanceAmount').textContent = "฿0";
     document.getElementById('walletPoints').textContent = "0";
     return;
   }
   const { data: wallet } = await sb.rpc('customer_get_wallet_info', { p_customer_id: currentCustomer.id });
-  if(wallet && wallet.length){
-    document.getElementById('walletBalanceAmount').textContent = displayAmount(wallet[0].wallet_balance);
-    document.getElementById('walletPoints').textContent = wallet[0].loyalty_points;
-  }
+  const points = (wallet && wallet.length) ? wallet[0].loyalty_points : 0;
+  document.getElementById('walletPoints').textContent = points;
+  const L = currentLang === 'zh';
+  document.getElementById('walletRedeemWaBtn').href = "https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(
+    (L ? "您好，我想用我的积分兑换优惠或礼物。我目前有 " : "Hi, I'd like to redeem my points for a discount or gift. I currently have ") + points + (L ? " 分。" : " points.")
+  );
 
   const { data, error } = await sb.from('orders').select('*').eq('customer_id', currentCustomer.id).order('created_at', {ascending:false});
   if(error){ listEl.innerHTML = "Error: " + error.message; return; }
@@ -870,42 +903,6 @@ async function loadWallet(){
   document.getElementById('walletTotalPaid').textContent = "฿" + paidTotal;
   document.getElementById('walletTotalPending').textContent = "฿" + pendingTotal;
   if(!data || data.length===0){ listEl.innerHTML = `<p style="font-size:12px; opacity:0.65;">${currentLang==='zh' ? '暂无记录。':'No transactions yet.'}</p>`; }
-}
-
-/* ---------- wallet top-up (customer requests amount, pays via QR, staff confirms) ---------- */
-async function requestTopup(evt){
-  const amount = parseFloat(document.getElementById('topupAmount').value);
-  if(!currentCustomer || !currentCustomer.id){ alert(currentLang==='zh' ? '请先登录。' : 'Please log in first.'); return; }
-  if(!amount || amount <= 0){ alert(currentLang==='zh' ? '请输入有效金额。' : 'Please enter a valid amount.'); return; }
-  const btnEl = evt ? evt.target : null;
-  if(btnEl){ btnEl.disabled = true; btnEl.style.opacity = 0.6; }
-  const { data: ref, error } = await sb.rpc('customer_create_topup', { p_customer_id: currentCustomer.id, p_amount: amount });
-  if(btnEl){ btnEl.disabled = false; btnEl.style.opacity = 1; }
-  if(error){ alert("Error: " + error.message); return; }
-  window._pendingTopup = { ref, amount };
-  document.getElementById('topupRefDisplay').value = ref;
-  document.getElementById('topupPayBox').classList.remove('hide');
-  document.getElementById('topupPayMsg').textContent = "";
-}
-async function confirmTopupPayment(evt){
-  const ref = document.getElementById('topupRefDisplay').value.trim();
-  const msgEl = document.getElementById('topupPayMsg');
-  const btnEl = evt ? evt.target : null;
-  if(btnEl){ btnEl.disabled = true; btnEl.style.opacity = 0.6; }
-  const { error } = await sb.rpc('customer_claim_topup', { p_ref: ref });
-  if(btnEl){ btnEl.disabled = false; btnEl.style.opacity = 1; }
-  if(error){ msgEl.textContent = "Error: " + error.message; msgEl.style.color = "#E88"; return; }
-  msgEl.textContent = I18N[currentLang].payMarkedOk; msgEl.style.color = "#8FD9A8";
-  const b = window._pendingTopup;
-  if(b){
-    const L = currentLang === 'zh';
-    let msg = (L ? "钱包充值（客户声明已付款，待核实）：\n" : "Wallet top-up (customer claims PAID — please verify):\n");
-    msg += (L ? "编号：" : "Ref: ") + b.ref + "\n";
-    msg += (L ? "金额：" : "Amount: ") + "฿" + b.amount + "\n";
-    msg += (L ? "客户：" : "Customer: ") + (currentCustomer.first_name||"") + " " + (currentCustomer.last_name||"") + "\n";
-    msg += (L ? "联系方式：" : "Contact: ") + (currentCustomer.phone||"");
-    window.open("https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(msg), "_blank");
-  }
 }
 
 /* ---------- step navigation ---------- */
@@ -947,7 +944,7 @@ function renderItemRows(){
   container.innerHTML = "";
   cartItems.forEach((it, idx)=>{
     const div = document.createElement('div');
-    div.className = 'item-card';
+    div.className = 'item-card locker-vents';
     div.innerHTML = `
       <span class="item-num">#${idx+1}</span>
       ${cartItems.length>1 ? `<button class="remove-item" onclick="removeItemRow(${it.id})">×</button>` : ''}
@@ -1066,6 +1063,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('pickupDate').addEventListener('change', ()=>{});
   initCarousel();
   setLang('en');
+  if(restoreSession()){ enterApp(); }
 });
 
 /* ---------- create booking ---------- */
@@ -1105,7 +1103,7 @@ async function createBooking(evt){
     });
   }
   if(currentCustomer && currentCustomer.id){
-    await sb.from('orders').update({ customer_id: currentCustomer.id }).eq('ref', ref);
+    await sb.rpc('customer_link_order', { p_ref: ref, p_customer_id: currentCustomer.id });
   }
 
   if(btnEl){ btnEl.disabled = false; btnEl.style.opacity = 1; }
