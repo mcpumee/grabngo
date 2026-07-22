@@ -440,7 +440,8 @@ async function renderLockersTable(){
   });
 }
 let ORDERS_MAP = {};
-let CHARGES_MAP = {}; // order_ref -> [extra_charge, ...]
+let CHARGES_MAP = {};
+let LOCKERS_BY_SIZE = {};
 
 function buildOrderRowHTML(o){
   const deliveryBadge = o.delivery_option === 'full_service'
@@ -458,7 +459,8 @@ function buildOrderRowHTML(o){
       return `<div style="font-size:10.5px; margin-top:4px; padding:4px 0; border-top:1px dotted rgba(228,217,190,0.15);">฿${c.amount} — ${c.reason||'Late fee'} · ${badge}</div>`;
     }).join('');
     actionCell = `<div>Locker ${o.locker_id}<br>Code: ${o.access_code}</div>
-      <div class="checkin-form"><input type="date" id="reissue-${o.ref}" style="grid-column:span 2;"><button onclick="reissueCode('${o.ref}')" style="grid-column:span 2;">Reissue Code (late)</button><div class="checkin-result" id="reissue-result-${o.ref}" style="grid-column:span 2;"></div></div>
+      <div class="checkin-form"><button onclick="markCollected('${o.ref}')" style="grid-column:span 2; background:#1f8f4f;">✓ Mark as Collected</button><div class="checkin-result" id="collect-result-${o.ref}" style="grid-column:span 2;"></div></div>
+      <div class="checkin-form" style="margin-top:6px;"><input type="date" id="reissue-${o.ref}" style="grid-column:span 2;"><button onclick="reissueCode('${o.ref}')" style="grid-column:span 2;">Reissue Code (late)</button><div class="checkin-result" id="reissue-result-${o.ref}" style="grid-column:span 2;"></div></div>
       ${isOverdue ? `<div style="margin-top:8px; padding:8px; background:#3a1a1a; border-radius:6px;">
         <div style="font-size:10.5px; color:#ff9a8d; font-weight:700; margin-bottom:4px;">⚠ OVERDUE — customer hasn't collected</div>
         <div class="checkin-form">
@@ -470,13 +472,23 @@ function buildOrderRowHTML(o){
       </div>` : ''}
       ${chargesHtml}`;
   } else if(['booked','purchasing','in_transit'].includes(o.status) && o.booking_paid){
+    const availableLockers = (LOCKERS_BY_SIZE[o.locker_size] || []);
+    const lockerOptions = availableLockers.length
+      ? availableLockers.map(id=>`<option value="${id}">${id}</option>`).join('')
+      : `<option value="">No ${o.locker_size} lockers free!</option>`;
     actionCell = `
       <div style="font-size:11px; opacity:0.75; margin-bottom:4px;">Stage: <b style="color:var(--mustard);">${o.status}</b></div>
       <div class="checkin-form">
         <button onclick="setProgress('${o.ref}','purchasing')" ${o.status==='purchasing'?'disabled':''}>Purchasing</button>
         <button onclick="setProgress('${o.ref}','in_transit')" ${o.status==='in_transit'?'disabled':''}>In Transit</button>
       </div>
-      <div class="checkin-form" style="margin-top:6px;"><select id="size-${o.ref}"><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option></select><label><input type="checkbox" id="retr-${o.ref}"> We collected it</label><button onclick="checkInOrder('${o.ref}')" style="grid-column:span 2;">Check In (item arrived)</button><div class="checkin-result" id="result-${o.ref}" style="grid-column:span 2;"></div></div>
+      <div class="checkin-form" style="margin-top:6px;">
+        <select id="locker-${o.ref}" style="grid-column:span 2;">${lockerOptions}</select>
+        <select id="size-${o.ref}"><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option></select>
+        <label><input type="checkbox" id="retr-${o.ref}"> We collected it</label>
+        <button onclick="checkInOrder('${o.ref}')" style="grid-column:span 2;">Check In (item arrived)</button>
+        <div class="checkin-result" id="result-${o.ref}" style="grid-column:span 2;"></div>
+      </div>
       <div class="checkin-result" id="progress-result-${o.ref}"></div>`;
   } else if(o.status === 'booked' && !o.booking_paid && o.payment_claimed_at){
     const claimedAgo = Math.round((Date.now() - new Date(o.payment_claimed_at).getTime())/60000);
@@ -491,15 +503,19 @@ function buildOrderRowHTML(o){
 async function renderCustomersOrdersList(){
   const container = document.getElementById('customersOrdersList');
   container.innerHTML = "Loading…";
-  const [{ data: customers, error: custErr }, { data: orders, error: ordErr }, { data: charges }] = await Promise.all([
+  const [{ data: customers, error: custErr }, { data: orders, error: ordErr }, { data: charges }, { data: lockers }] = await Promise.all([
     sb.rpc('admin_list_customers', { pin: ADMIN_SESSION_PIN }),
     sb.from('orders').select('*').order('created_at', {ascending:false}),
-    sb.from('extra_charges').select('*').order('created_at', {ascending:false})
+    sb.from('extra_charges').select('*').order('created_at', {ascending:false}),
+    sb.from('lockers').select('*').eq('status','available').order('id')
   ]);
   if(custErr || ordErr){ container.innerHTML = "Error: " + ((custErr||ordErr).message); return; }
 
   ORDERS_MAP = {};
   (orders||[]).forEach(o=>{ ORDERS_MAP[o.ref] = o; });
+
+  LOCKERS_BY_SIZE = {};
+  (lockers||[]).forEach(l=>{ (LOCKERS_BY_SIZE[l.size] = LOCKERS_BY_SIZE[l.size] || []).push(l.id); });
 
   CHARGES_MAP = {};
   (charges||[]).forEach(c=>{ (CHARGES_MAP[c.order_ref] = CHARGES_MAP[c.order_ref] || []).push(c); });
@@ -614,14 +630,23 @@ function notifyCustomer(ref, locker, code){
   window.open("https://wa.me/"+phone+"?text="+encodeURIComponent(msg), "_blank");
 }
 async function checkInOrder(ref){
+  const lockerId = document.getElementById('locker-'+ref).value;
   const size = document.getElementById('size-'+ref).value;
   const usedRetrieval = document.getElementById('retr-'+ref).checked;
   const resultEl = document.getElementById('result-'+ref);
-  const { data, error } = await sb.rpc('admin_check_in_booking', { pin: ADMIN_SESSION_PIN, p_ref: ref, p_used_retrieval: usedRetrieval, p_parcel_size: size });
+  if(!lockerId){ resultEl.textContent = "No locker selected/available for this size."; resultEl.style.color = "#E88"; return; }
+  const { data, error } = await sb.rpc('admin_check_in_booking_v2', { pin: ADMIN_SESSION_PIN, p_ref: ref, p_locker_id: lockerId, p_used_retrieval: usedRetrieval, p_parcel_size: size });
   if(error){ resultEl.textContent = "Error: " + error.message; resultEl.style.color = "#E88"; return; }
   const [locker, code] = data.split(':');
   resultEl.innerHTML = `Locker ${locker} — code ${code} <button class="notify-btn" onclick="notifyCustomer('${ref}','${locker}','${code}')">📤 Notify Customer</button>`;
   resultEl.style.color = "#8FD9A8";
+  renderCustomersOrdersList(); renderLockersTable();
+}
+async function markCollected(ref){
+  const resultEl = document.getElementById('collect-result-'+ref);
+  const { error } = await sb.rpc('admin_mark_collected', { pin: ADMIN_SESSION_PIN, p_ref: ref });
+  if(error){ resultEl.textContent = "Error: " + error.message; resultEl.style.color = "#E88"; return; }
+  resultEl.textContent = "Marked as collected."; resultEl.style.color = "#8FD9A8";
   renderCustomersOrdersList(); renderLockersTable();
 }
 async function createExtraCharge(ref){
