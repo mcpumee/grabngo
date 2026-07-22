@@ -268,11 +268,6 @@
     </div>
 
     <div class="admin-card">
-      <h3>Wallet Top-Ups</h3>
-      <table><thead><tr><th>Ref</th><th>Customer</th><th>Amount</th><th>Status / Action</th></tr></thead><tbody id="topupsTableBody"></tbody></table>
-    </div>
-
-    <div class="admin-card">
       <h3 style="display:flex; justify-content:space-between; align-items:center;">Bookings <button class="export-btn" onclick="exportBookingsToExcel()">⬇ Export to Excel</button></h3>
       <table><thead><tr><th>Reference</th><th>Booking</th><th>Status / Action</th></tr></thead><tbody id="ordersTableBody"></tbody></table>
     </div>
@@ -302,7 +297,7 @@ async function checkPin(){
   ADMIN_SESSION_PIN = val; errEl.textContent = "";
   document.getElementById('login-screen').classList.add('hide');
   document.getElementById('admin-view').classList.remove('hide');
-  renderPromoTable(); renderOrdersTable(); renderLockersTable(); loadSettingsIntoAdminForm(); renderTopupsTable();
+  renderPromoTable(); renderOrdersTable(); renderLockersTable(); loadSettingsIntoAdminForm();
 }
 function logoutAdmin(){
   ADMIN_SESSION_PIN = null;
@@ -396,32 +391,6 @@ async function removePromo(code){
   if(error){ alert("Error removing code: " + error.message); return; }
   renderPromoTable();
 }
-async function renderTopupsTable(){
-  const body = document.getElementById('topupsTableBody');
-  const { data, error } = await sb.rpc('admin_list_pending_topups');
-  body.innerHTML = "";
-  if(error){ body.innerHTML = `<tr><td colspan="4">Error: ${error.message}</td></tr>`; return; }
-  if(!data || data.length===0){ body.innerHTML = `<tr><td colspan="4">No top-up requests.</td></tr>`; return; }
-  data.forEach(t=>{
-    const tr = document.createElement('tr');
-    let actionCell = `<span style="opacity:0.6;">Pending</span>`;
-    if(t.status === 'confirmed'){
-      actionCell = `<span class="paid-chip yes">CONFIRMED</span>`;
-    } else if(t.status === 'claimed'){
-      const claimedAgo = t.payment_claimed_at ? Math.round((Date.now() - new Date(t.payment_claimed_at).getTime())/60000) : '?';
-      actionCell = `<div>Claimed ${claimedAgo}m ago<br><button onclick="confirmTopup('${t.ref}')">Confirm Payment</button><div class="checkin-result" id="topup-result-${t.ref}"></div></div>`;
-    }
-    tr.innerHTML = `<td class="mono">${t.ref}</td><td>${t.customer_name}</td><td class="mono">\u0e3f${t.amount}</td><td>${actionCell}</td>`;
-    body.appendChild(tr);
-  });
-}
-async function confirmTopup(ref){
-  const resultEl = document.getElementById('topup-result-'+ref);
-  const { error } = await sb.rpc('admin_confirm_topup', { pin: ADMIN_SESSION_PIN, p_ref: ref });
-  if(error){ resultEl.textContent = "Error: " + error.message; resultEl.style.color = "#E88"; return; }
-  resultEl.textContent = "Confirmed."; resultEl.style.color = "#8FD9A8";
-  renderTopupsTable();
-}
 async function renderLockersTable(){
   const body = document.getElementById('lockersTableBody');
   const { data, error } = await sb.from('lockers').select('*').order('id');
@@ -448,8 +417,15 @@ async function renderOrdersTable(){
     if(o.status === 'stored'){
       actionCell = `<div>Locker ${o.locker_id}<br>Code: ${o.access_code}</div>
         <div class="checkin-form"><input type="date" id="reissue-${o.ref}" style="grid-column:span 2;"><button onclick="reissueCode('${o.ref}')" style="grid-column:span 2;">Reissue Code (late)</button><div class="checkin-result" id="reissue-result-${o.ref}" style="grid-column:span 2;"></div></div>`;
-    } else if(o.status === 'booked' && o.booking_paid){
-      actionCell = `<div class="checkin-form"><select id="size-${o.ref}"><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option></select><label><input type="checkbox" id="retr-${o.ref}"> We collected it</label><button onclick="checkInOrder('${o.ref}')" style="grid-column:span 2;">Check In (item arrived)</button><div class="checkin-result" id="result-${o.ref}" style="grid-column:span 2;"></div></div>`;
+    } else if(['booked','purchasing','in_transit'].includes(o.status) && o.booking_paid){
+      actionCell = `
+        <div style="font-size:11px; opacity:0.75; margin-bottom:4px;">Stage: <b style="color:var(--mustard);">${o.status}</b></div>
+        <div class="checkin-form">
+          <button onclick="setProgress('${o.ref}','purchasing')" ${o.status==='purchasing'?'disabled':''}>Purchasing</button>
+          <button onclick="setProgress('${o.ref}','in_transit')" ${o.status==='in_transit'?'disabled':''}>In Transit</button>
+        </div>
+        <div class="checkin-form" style="margin-top:6px;"><select id="size-${o.ref}"><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option></select><label><input type="checkbox" id="retr-${o.ref}"> We collected it</label><button onclick="checkInOrder('${o.ref}')" style="grid-column:span 2;">Check In (item arrived)</button><div class="checkin-result" id="result-${o.ref}" style="grid-column:span 2;"></div></div>
+        <div class="checkin-result" id="progress-result-${o.ref}"></div>`;
     } else if(o.status === 'booked' && !o.booking_paid && o.payment_claimed_at){
       const claimedAgo = Math.round((Date.now() - new Date(o.payment_claimed_at).getTime())/60000);
       actionCell = `<div class="checkin-form"><div style="grid-column:span 2; color:#D6A441; font-size:11px;">Customer claims paid — ${claimedAgo}m ago.</div><button onclick="confirmPayment('${o.ref}')" style="grid-column:span 2;">Confirm Payment Received</button><div class="checkin-result" id="confirm-result-${o.ref}" style="grid-column:span 2;"></div></div>`;
@@ -519,6 +495,13 @@ async function confirmPayment(ref){
   resultEl.textContent = "Payment confirmed."; resultEl.style.color = "#8FD9A8";
   renderOrdersTable();
 }
+async function setProgress(ref, status){
+  const resultEl = document.getElementById('progress-result-'+ref);
+  const { error } = await sb.rpc('admin_set_progress_status', { pin: ADMIN_SESSION_PIN, p_ref: ref, p_status: status });
+  if(error){ resultEl.textContent = "Error: " + error.message; resultEl.style.color = "#E88"; return; }
+  resultEl.textContent = "Updated to " + status + "."; resultEl.style.color = "#8FD9A8";
+  renderOrdersTable();
+}
 async function checkInOrder(ref){
   const size = document.getElementById('size-'+ref).value;
   const usedRetrieval = document.getElementById('retr-'+ref).checked;
@@ -544,7 +527,6 @@ async function exportBookingsToExcel(){
   const { data: orders, error } = await sb.from('orders').select('*').order('created_at', {ascending:false});
   if(error || !orders){ alert("Error loading bookings: " + (error?.message||"unknown")); return; }
   const { data: items } = await sb.from('order_items').select('*');
-  const { data: topups } = await sb.rpc('admin_list_pending_topups');
 
   const bookingRows = orders.map(o => ({
     Reference: o.ref,
@@ -578,19 +560,9 @@ async function exportBookingsToExcel(){
     "Estimated Price": it.estimated_price || ""
   }));
 
-  const topupRows = (topups||[]).map(t => ({
-    Reference: t.ref,
-    Customer: t.customer_name,
-    Amount: t.amount,
-    Status: t.status,
-    "Payment Claimed At": t.payment_claimed_at || "",
-    "Created At": t.created_at
-  }));
-
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(bookingRows), "Bookings");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(itemRows), "Item Details");
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(topupRows), "Wallet Top-Ups");
   XLSX.writeFile(wb, "grabngo-bookings-" + new Date().toISOString().slice(0,10) + ".xlsx");
 }
 </script>
