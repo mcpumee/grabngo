@@ -454,7 +454,7 @@ function buildOrderRowHTML(o){
     const charges = CHARGES_MAP[o.ref] || [];
     let chargesHtml = charges.map(c=>{
       let badge = c.status==='confirmed' ? `<span class="paid-chip yes">PAID ฿${c.amount}</span>`
-        : c.status==='claimed' ? `<span style="color:#D6A441;">Claimed — awaiting confirm</span> <button onclick="confirmExtraCharge('${c.id}','${o.ref}')">Confirm</button>`
+        : c.status==='claimed' ? `<span style="color:#D6A441;">Claimed — awaiting confirm</span> <button onclick="confirmExtraCharge('${c.id}','${o.ref}')">Confirm</button>${c.payment_slip_url ? ` <a href="${c.payment_slip_url}" target="_blank" style="color:var(--mustard);">📎 View slip</a>` : ' <span style="color:#ff9a8d;">(no slip attached)</span>'}`
         : `<span style="opacity:0.6;">Awaiting payment</span>`;
       return `<div style="font-size:10.5px; margin-top:4px; padding:4px 0; border-top:1px dotted rgba(228,217,190,0.15);">฿${c.amount} — ${c.reason||'Late fee'} · ${badge}</div>`;
     }).join('');
@@ -484,15 +484,14 @@ function buildOrderRowHTML(o){
       </div>
       <div class="checkin-form" style="margin-top:6px;">
         <select id="locker-${o.ref}" style="grid-column:span 2;">${lockerOptions}</select>
-        <select id="size-${o.ref}"><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option></select>
-        <label><input type="checkbox" id="retr-${o.ref}"> We collected it</label>
+        <label style="grid-column:span 2;"><input type="checkbox" id="retr-${o.ref}"> We collected it (retrieval service used)</label>
         <button onclick="checkInOrder('${o.ref}')" style="grid-column:span 2;">Check In (item arrived)</button>
         <div class="checkin-result" id="result-${o.ref}" style="grid-column:span 2;"></div>
       </div>
       <div class="checkin-result" id="progress-result-${o.ref}"></div>`;
   } else if(o.status === 'booked' && !o.booking_paid && o.payment_claimed_at){
     const claimedAgo = Math.round((Date.now() - new Date(o.payment_claimed_at).getTime())/60000);
-    actionCell = `<div class="checkin-form"><div style="grid-column:span 2; color:#D6A441; font-size:11px;">Customer claims paid — ${claimedAgo}m ago.</div><button onclick="confirmPayment('${o.ref}')" style="grid-column:span 2;">Confirm Payment Received</button><div class="checkin-result" id="confirm-result-${o.ref}" style="grid-column:span 2;"></div></div>`;
+    actionCell = `<div class="checkin-form"><div style="grid-column:span 2; color:#D6A441; font-size:11px;">Customer claims paid — ${claimedAgo}m ago. ${o.payment_slip_url ? `<a href="${o.payment_slip_url}" target="_blank" style="color:var(--mustard);">📎 View slip</a>` : '<span style="color:#ff9a8d;">(no slip attached)</span>'}</div><button onclick="confirmPayment('${o.ref}')" style="grid-column:span 2;">Confirm Payment Received</button><div class="checkin-result" id="confirm-result-${o.ref}" style="grid-column:span 2;"></div></div>`;
   } else if(o.status === 'booked' && !o.booking_paid){
     actionCell = `<span style="opacity:0.6;">Waiting for payment</span>`;
   }
@@ -631,11 +630,10 @@ function notifyCustomer(ref, locker, code){
 }
 async function checkInOrder(ref){
   const lockerId = document.getElementById('locker-'+ref).value;
-  const size = document.getElementById('size-'+ref).value;
   const usedRetrieval = document.getElementById('retr-'+ref).checked;
   const resultEl = document.getElementById('result-'+ref);
   if(!lockerId){ resultEl.textContent = "No locker selected/available for this size."; resultEl.style.color = "#E88"; return; }
-  const { data, error } = await sb.rpc('admin_check_in_booking_v2', { pin: ADMIN_SESSION_PIN, p_ref: ref, p_locker_id: lockerId, p_used_retrieval: usedRetrieval, p_parcel_size: size });
+  const { data, error } = await sb.rpc('admin_check_in_booking_v2', { pin: ADMIN_SESSION_PIN, p_ref: ref, p_locker_id: lockerId, p_used_retrieval: usedRetrieval, p_parcel_size: 'medium' });
   if(error){ resultEl.textContent = "Error: " + error.message; resultEl.style.color = "#E88"; return; }
   const [locker, code] = data.split(':');
   resultEl.innerHTML = `Locker ${locker} — code ${code} <button class="notify-btn" onclick="notifyCustomer('${ref}','${locker}','${code}')">📤 Notify Customer</button>`;
