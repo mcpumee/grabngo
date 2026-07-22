@@ -36,6 +36,7 @@
   .lang-toggle button.active{ background:var(--mustard); color:var(--ink); }
   .user-chip{ font-size:11px; opacity:0.8; display:flex; align-items:center; gap:6px; }
   .user-chip button{ background:none; border:1px solid rgba(228,217,190,0.4); color:var(--paper); padding:3px 8px; border-radius:5px; font-size:10px; cursor:pointer; }
+  .currency-select{ background:var(--ink-light); color:var(--paper); border:1.5px solid var(--mustard); border-radius:7px; font-size:11px; font-weight:700; padding:5px 6px; cursor:pointer; }
 
   .field{ margin-bottom:12px; }
   .field label{ display:block; font-size:12.5px; font-weight:600; margin-bottom:5px; color:var(--ink); }
@@ -43,12 +44,16 @@
   .field input:focus, .field textarea:focus, .field select:focus{ outline:none; border-color:var(--mustard); box-shadow:var(--sh-inset), 0 0 0 3px rgba(214,164,65,0.25); }
   .field input[type=file]{ padding:9px; font-size:12.5px; box-shadow:none; }
 
-  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; background:linear-gradient(180deg, #e0453f, var(--stamp)); color:#fff; border:none; padding:15px 20px; border-radius:10px; font-weight:700; font-size:15px; cursor:pointer; box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.25); transition:transform 0.08s ease, box-shadow 0.15s ease; }
-  .btn:active{ transform:translateY(1px); box-shadow:var(--sh-sm); }
+  .btn{ position:relative; overflow:hidden; display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; background:linear-gradient(180deg, #e0453f, var(--stamp)); color:#fff; border:none; padding:15px 20px; border-radius:12px; font-weight:700; font-size:15px; cursor:pointer; box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.3); transition:transform 0.15s cubic-bezier(.34,1.56,.64,1), box-shadow 0.15s ease; }
+  .btn::after{ content:""; position:absolute; top:0; left:-60%; width:40%; height:100%; background:linear-gradient(120deg, transparent, rgba(255,255,255,0.35), transparent); transform:skewX(-20deg); transition:left 0.5s ease; }
+  .btn:hover::after{ left:130%; }
+  .btn:hover{ transform:translateY(-2px) scale(1.015); box-shadow:0 8px 16px rgba(139,30,30,0.22), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .btn:active{ transform:translateY(1px) scale(0.97); box-shadow:var(--sh-sm); }
   .btn.dark{ background:linear-gradient(180deg, var(--ink-light), var(--ink)); color:var(--paper); }
   .btn.outline{ background:var(--paper-light); color:var(--ink); border:2px solid var(--ink); box-shadow:var(--sh-sm); }
   .btn.small{ padding:10px; font-size:13px; }
   .btn:disabled{ opacity:0.5; cursor:default; transform:none; }
+  .btn:disabled::after{ display:none; }
 
   /* ===== AUTH VIEW ===== */
   #auth-view{ padding:20px 0; }
@@ -94,15 +99,15 @@
   .add-item-btn{ width:100%; padding:12px; border:2px dashed var(--ink); border-radius:10px; background:none; font-weight:700; font-size:13px; color:var(--ink); cursor:pointer; margin-bottom:16px;}
 
   .size-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-bottom:6px; }
-  .size-opt{ border:1.5px solid var(--ink); border-radius:8px; padding:10px 4px; text-align:center; cursor:pointer; background:var(--paper-light); box-shadow:var(--sh-sm); transition:transform 0.1s ease, box-shadow 0.15s ease; }
-  .size-opt:active{ transform:translateY(1px); }
-  .size-opt.selected{ background:linear-gradient(180deg,#e8b95a,var(--mustard)); box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.35); transform:translateY(-1px); }
+  .size-opt{ border:1.5px solid var(--ink); border-radius:8px; padding:10px 4px; text-align:center; cursor:pointer; background:var(--paper-light); box-shadow:var(--sh-sm); transition:transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.15s ease; }
+  .size-opt:active{ transform:scale(0.94); }
+  .size-opt.selected{ background:linear-gradient(180deg,#e8b95a,var(--mustard)); box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.35); transform:translateY(-2px) scale(1.04); }
   .size-opt strong{ display:block; font-size:13px; color:var(--ink); }
   .size-opt .r{ font-family:'Space Mono',monospace; font-size:10px; color:var(--ink); opacity:0.75; margin-top:2px;}
   .temp-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-bottom:6px; }
-  .temp-opt{ border:1.5px solid var(--ink); border-radius:8px; padding:10px 4px; text-align:center; cursor:pointer; background:var(--paper-light); box-shadow:var(--sh-sm); transition:transform 0.1s ease, box-shadow 0.15s ease; }
-  .temp-opt:active{ transform:translateY(1px); }
-  .temp-opt.selected{ background:linear-gradient(180deg,#3a8079,var(--teal)); color:#fff; box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.25); transform:translateY(-1px); }
+  .temp-opt{ border:1.5px solid var(--ink); border-radius:8px; padding:10px 4px; text-align:center; cursor:pointer; background:var(--paper-light); box-shadow:var(--sh-sm); transition:transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.15s ease; }
+  .temp-opt:active{ transform:scale(0.94); }
+  .temp-opt.selected{ background:linear-gradient(180deg,#3a8079,var(--teal)); color:#fff; box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.25); transform:translateY(-2px) scale(1.04); }
   .temp-opt strong{ display:block; font-size:11px; }
   .temp-opt .r{ font-family:'Space Mono',monospace; font-size:9px; opacity:0.8; margin-top:2px;}
   .field-row{ display:flex; gap:10px; }
@@ -171,8 +176,11 @@
   .tab-nav button.active{ background:linear-gradient(180deg,var(--ink-light),var(--ink)); color:var(--paper); box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.15); }
 
   .bottom-nav{ position:fixed; bottom:0; left:0; right:0; z-index:15; background:linear-gradient(180deg,var(--ink-light),var(--ink)); border-top:2px solid var(--stamp); display:flex; padding-bottom:env(safe-area-inset-bottom, 0); box-shadow:0 -4px 14px rgba(0,0,0,0.25); }
-  .bottom-nav button{ flex:1; background:none; border:none; color:var(--paper); opacity:0.6; padding:9px 4px 8px; display:flex; flex-direction:column; align-items:center; gap:3px; font-size:9.5px; font-weight:600; cursor:pointer; }
-  .bottom-nav button.active{ opacity:1; color:#FFD9D6; }
+  .bottom-nav button{ flex:1; background:none; border:none; color:var(--paper); opacity:0.6; padding:9px 4px 8px; display:flex; flex-direction:column; align-items:center; gap:3px; font-size:9.5px; font-weight:600; cursor:pointer; transition:opacity 0.2s ease, transform 0.25s cubic-bezier(.34,1.56,.64,1); }
+  .bottom-nav button svg{ transition:transform 0.25s cubic-bezier(.34,1.56,.64,1); }
+  .bottom-nav button:active{ transform:scale(0.9); }
+  .bottom-nav button.active{ opacity:1; color:#FFD9D6; transform:translateY(-3px); }
+  .bottom-nav button.active svg{ transform:scale(1.15); filter:drop-shadow(0 2px 4px rgba(0,0,0,0.35)); }
   .bottom-nav svg{ width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
   body{ padding-bottom:70px; }
 
@@ -188,6 +196,10 @@
   .booking-card .top-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
   .booking-card .ref{ font-family:'Space Mono',monospace; font-weight:700; color:var(--ink); font-size:13px; }
   .booking-card .meta{ font-size:11.5px; opacity:0.7; }
+  .wallet-balance-card{ background:linear-gradient(160deg,var(--ink-light),var(--ink)); border-radius:16px; padding:22px; text-align:center; box-shadow:var(--sh-lg); color:#fff; }
+  .wallet-balance-label{ font-size:11px; letter-spacing:0.1em; opacity:0.75; margin-bottom:6px; }
+  .wallet-balance-amount{ font-family:'Space Mono',monospace; font-size:34px; font-weight:700; color:#FFD9D6; }
+  .wallet-points-row{ margin-top:10px; font-size:13px; font-weight:600; }
 
   #admin-view{ background:var(--charcoal); min-height:100vh; color:var(--paper); }
   .admin-wrap{ max-width:560px; margin:0 auto; padding:20px 18px 60px; }
@@ -297,8 +309,14 @@
 <!-- ===================== BOOKING FLOW (logged-in) ===================== -->
 <div id="booking-view" class="hide">
   <div class="topbar">
-    <div class="brand" style="cursor:pointer;" onclick="showMainTab('home')">GrabNGo</div>
+    <div class="brand" style="cursor:pointer;" onclick="showMainTab('search')">GrabNGo</div>
       <div class="user-chip"><span id="userGreeting">—</span><button onclick="logout()" data-i18n="logoutBtn">Log Out</button></div>
+      <select id="currencySelect" class="currency-select" onchange="setCurrency(this.value)">
+        <option value="THB">🇹🇭 THB</option>
+        <option value="MYR">🇲🇾 MYR</option>
+        <option value="SGD">🇸🇬 SGD</option>
+        <option value="CNY">🇨🇳 CNY</option>
+      </select>
       <div class="lang-toggle">
         <button class="lang-en-btn active" onclick="setLang('en')">EN</button>
         <button class="lang-zh-btn" onclick="setLang('zh')">中文</button>
@@ -306,26 +324,6 @@
     </div>
   </div>
   <div class="wrap">
-
-    <!-- ===== HOME (default view, ad carousel) ===== -->
-    <div id="tab-content-home">
-      <div class="auth-hero" style="text-align:center;">
-        <h2 class="step-title" style="margin-bottom:4px;" data-i18n="homeWelcome">Welcome back!</h2>
-        <p style="font-size:12.5px; opacity:0.75;" data-i18n="homeWelcomeSub">Use the buttons below to get started.</p>
-      </div>
-
-      <div class="stores-strip" style="margin-top:20px;">
-        <div class="stores-strip-label" data-i18n="storesLabel">FULL-SERVICE PICKUP AVAILABLE AT</div>
-        <div class="stores-chips">
-          <span class="store-chip">🏪 7-Eleven</span>
-          <span class="store-chip">📦 Makro</span>
-          <span class="store-chip">🛒 Go Wholesale</span>
-          <span class="store-chip">🛍️ Lotus's</span>
-          <span class="store-chip">🏬 Central Hatyai</span>
-          <span class="store-chip more" data-i18n="storesMore">+ more stores</span>
-        </div>
-      </div>
-    </div>
 
     <!-- ===== SEARCH ITEMS (booking flow) ===== -->
     <div id="tab-content-search" class="hide">
@@ -454,41 +452,32 @@
       <h2 class="step-title" data-i18n="myBookingsTitle">Your Bookings</h2>
       <div id="myBookingsList"><p style="font-size:12px; opacity:0.6;">Loading…</p></div>
 
-      <div style="margin-top:20px; padding-top:16px; border-top:1.5px dashed rgba(139,30,30,0.25);">
-        <p style="font-size:11px; opacity:0.7; margin-bottom:8px;" data-i18n="trackHint">Looking up a booking for someone else? Search by reference number or name below.</p>
-        <div class="track-form">
-          <input type="text" id="trackInput" data-i18n-ph="trackPh" placeholder="e.g. HHC-482913 or your name">
-          <button onclick="trackOrder()" data-i18n="trackBtn">Track</button>
+      <div id="track-result" class="hide" style="margin-top:16px;">
+        <div class="receipt" id="track-receipt-capture">
+          <div class="receipt-head">
+            <div><div class="stencil">GrabNGo</div><div style="font-size:11px; opacity:0.6;" data-i18n="receiptSub">Booking Slip</div></div>
+            <span class="status-chip" id="t-status-chip">—</span>
+          </div>
+          <div class="receipt-row"><span class="k" data-i18n="rRef">Reference</span><span class="v mono" id="t-ref">—</span></div>
+          <div class="receipt-row"><span class="k" data-i18n="rSize">Size / Mode</span><span class="v" id="t-size">—</span></div>
+          <div class="receipt-row"><span class="k" data-i18n="rDropoff">Drop-off</span><span class="v" id="t-dropoff">—</span></div>
+          <div class="receipt-row"><span class="k" data-i18n="rPickup">Pickup</span><span class="v" id="t-pickup">—</span></div>
+          <div class="receipt-row"><span class="k" data-i18n="rPaid">Paid</span><span class="v" id="t-paid">—</span></div>
+          <div id="t-locker-wrap" class="hide">
+            <div class="access-code-box">
+              <div class="lbl" data-i18n="rLockerLbl">YOUR LOCKER</div><div class="code" id="t-locker">—</div>
+              <div class="lbl" style="margin-top:6px;" data-i18n="rCodeLbl">ACCESS CODE</div><div class="code" id="t-code">••••••</div>
+              <div style="font-size:9px; color:#E88; margin-top:4px;" id="t-expiry"></div>
+            </div>
+          </div>
+          <div id="t-release-wrap" class="hide">
+            <div class="release-box"><input type="text" id="releaseCode" data-i18n-ph="releaseCodePh" placeholder="Access code" maxlength="6"><button onclick="releaseLocker()" data-i18n="releaseBtn">Open</button></div>
+            <div class="track-msg" id="releaseMsg"></div>
+          </div>
         </div>
-        <div class="track-msg" id="trackMsg"></div>
-        <div id="track-multi" class="hide"></div>
-        <div id="track-result" class="hide">
-          <div class="receipt" id="track-receipt-capture">
-            <div class="receipt-head">
-              <div><div class="stencil">GrabNGo</div><div style="font-size:11px; opacity:0.6;" data-i18n="receiptSub">Booking Slip</div></div>
-              <span class="status-chip" id="t-status-chip">—</span>
-            </div>
-            <div class="receipt-row"><span class="k" data-i18n="rRef">Reference</span><span class="v mono" id="t-ref">—</span></div>
-            <div class="receipt-row"><span class="k" data-i18n="rSize">Size / Mode</span><span class="v" id="t-size">—</span></div>
-            <div class="receipt-row"><span class="k" data-i18n="rDropoff">Drop-off</span><span class="v" id="t-dropoff">—</span></div>
-            <div class="receipt-row"><span class="k" data-i18n="rPickup">Pickup</span><span class="v" id="t-pickup">—</span></div>
-            <div class="receipt-row"><span class="k" data-i18n="rPaid">Paid</span><span class="v" id="t-paid">—</span></div>
-            <div id="t-locker-wrap" class="hide">
-              <div class="access-code-box">
-                <div class="lbl" data-i18n="rLockerLbl">YOUR LOCKER</div><div class="code" id="t-locker">—</div>
-                <div class="lbl" style="margin-top:6px;" data-i18n="rCodeLbl">ACCESS CODE</div><div class="code" id="t-code">••••••</div>
-                <div style="font-size:9px; color:#E88; margin-top:4px;" id="t-expiry"></div>
-              </div>
-            </div>
-            <div id="t-release-wrap" class="hide">
-              <div class="release-box"><input type="text" id="releaseCode" data-i18n-ph="releaseCodePh" placeholder="Access code" maxlength="6"><button onclick="releaseLocker()" data-i18n="releaseBtn">Open</button></div>
-              <div class="track-msg" id="releaseMsg"></div>
-            </div>
-          </div>
-          <div class="save-reminder">
-            <div class="save-reminder-text">📸 <span data-i18n="saveReminderText">Save this now — screenshot or download it so you don't lose your reference and code.</span></div>
-            <button class="btn dark" onclick="downloadSlip('track-receipt-capture','track')" data-i18n="downloadSlipBtn">⬇ Download as Image</button>
-          </div>
+        <div class="save-reminder">
+          <div class="save-reminder-text">📸 <span data-i18n="saveReminderText">Save this now — screenshot or download it so you don't lose your reference and code.</span></div>
+          <button class="btn dark" onclick="downloadSlip('track-receipt-capture','track')" data-i18n="downloadSlipBtn">⬇ Download as Image</button>
         </div>
       </div>
     </div>
@@ -497,8 +486,30 @@
     <div id="tab-content-wallet" class="hide">
       <div class="step-label" data-i18n="walletLabel">MY WALLET</div>
       <h2 class="step-title" data-i18n="walletTitle">Billing Summary</h2>
+
+      <div class="wallet-balance-card">
+        <div class="wallet-balance-label" data-i18n="walletBalanceLabel">WALLET BALANCE</div>
+        <div class="wallet-balance-amount" id="walletBalanceAmount">฿0</div>
+        <div class="wallet-points-row">🏅 <span id="walletPoints">0</span> <span data-i18n="walletPointsLabel">points earned</span></div>
+      </div>
+
+      <div class="summary-card" style="margin-top:14px;">
+        <h4 data-i18n="walletTopupLabel">TOP UP WALLET</h4>
+        <div class="field"><label data-i18n="walletTopupAmountLabel">Amount to top up (฿)</label><input type="number" id="topupAmount" min="1" style="color:var(--charcoal);"></div>
+        <button class="btn dark" onclick="requestTopup(event)" data-i18n="walletTopupBtn">Request Top-Up</button>
+        <div id="topupPayBox" class="hide" style="margin-top:14px;">
+          <div class="qr-box"><span>QR CODE</span></div>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="topupRefDisplay" class="mono" readonly style="flex:1; padding:11px; border-radius:8px; border:none; font-size:13px;">
+            <button class="btn small dark" style="width:auto; padding:0 16px;" onclick="confirmTopupPayment(event)" data-i18n="markPaidBtn">I've Paid</button>
+          </div>
+          <div class="pay-status-msg" id="topupPayMsg"></div>
+        </div>
+      </div>
+
       <div class="summary-card">
-        <div class="summary-row"><span data-i18n="walletTotalPaid">Total paid</span><span class="v" id="walletTotalPaid">฿0</span></div>
+        <h4 data-i18n="walletHistoryLabel">TRANSACTION HISTORY</h4>
+        <div class="summary-row"><span data-i18n="walletTotalPaid">Total paid (bookings)</span><span class="v" id="walletTotalPaid">฿0</span></div>
         <div class="summary-row"><span data-i18n="walletTotalPending">Awaiting payment</span><span class="v" id="walletTotalPending">฿0</span></div>
       </div>
       <div id="walletList"><p style="font-size:12px; opacity:0.6;">Loading…</p></div>
@@ -603,7 +614,10 @@ const I18N = {
     homeWelcome:"Welcome back!", homeWelcomeSub:"Use the buttons below to get started.",
     myBookingsLabel:"MY BOOKINGS", myBookingsTitle:"Your Bookings",
     walletLabel:"MY WALLET", walletTitle:"Billing Summary",
-    walletTotalPaid:"Total paid", walletTotalPending:"Awaiting payment",
+    walletBalanceLabel:"WALLET BALANCE", walletPointsLabel:"points earned",
+    walletTopupLabel:"TOP UP WALLET", walletTopupAmountLabel:"Amount to top up (฿)", walletTopupBtn:"Request Top-Up",
+    walletHistoryLabel:"TRANSACTION HISTORY",
+    walletTotalPaid:"Total paid (bookings)", walletTotalPending:"Awaiting payment",
     contactLabel:"CONTACT ADMIN", contactTitle:"Need Help?",
     contactText:"Message us directly on WhatsApp for any questions about your booking.",
     contactWaBtn:"💬 Chat on WhatsApp",
@@ -674,7 +688,10 @@ const I18N = {
     homeWelcome:"欢迎回来！", homeWelcomeSub:"请使用下方按钮开始使用。",
     myBookingsLabel:"我的预订", myBookingsTitle:"您的预订",
     walletLabel:"我的钱包", walletTitle:"账单摘要",
-    walletTotalPaid:"已付总额", walletTotalPending:"待付款总额",
+    walletBalanceLabel:"钱包余额", walletPointsLabel:"积分",
+    walletTopupLabel:"钱包充值", walletTopupAmountLabel:"充值金额（฿）", walletTopupBtn:"申请充值",
+    walletHistoryLabel:"交易记录",
+    walletTotalPaid:"已付总额（预订）", walletTotalPending:"待付款总额",
     contactLabel:"联系客服", contactTitle:"需要帮助？",
     contactText:"如对预订有任何疑问，欢迎直接通过 WhatsApp 联系我们。",
     contactWaBtn:"💬 通过 WhatsApp 联系",
@@ -753,7 +770,7 @@ function enterApp(){
   document.getElementById('contactWaBtn').href = "https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent("Hi, I need help with my GrabNGo booking.");
   if(cartItems.length===0){ addItemRow(); }
   loadSettings();
-  showMainTab('home');
+  showMainTab('search');
 }
 function logout(){
   currentCustomer = null;
@@ -761,7 +778,7 @@ function logout(){
   document.getElementById('auth-view').classList.remove('hide');
 }
 function showMainTab(tab){
-  ['home','search','bookings','wallet','contact'].forEach(t=>{
+  ['search','bookings','wallet','contact'].forEach(t=>{
     document.getElementById('tab-content-'+t).classList.toggle('hide', t!==tab);
   });
   ['search','bookings','wallet','contact'].forEach(t=>{
@@ -801,7 +818,7 @@ function carouselMove(dir){
 async function loadMyBookings(){
   const listEl = document.getElementById('myBookingsList');
   if(!currentCustomer || !currentCustomer.id){
-    listEl.innerHTML = `<p style="font-size:12px; opacity:0.65;">${currentLang==='zh' ? '登录后即可查看您的预订。目前请用下方的编号或姓名搜索。' : "We'll list your bookings here once linked to your account. For now, search by reference or name below."}</p>`;
+    listEl.innerHTML = `<p style="font-size:12px; opacity:0.65;">${currentLang==='zh' ? '请先登录以查看您的预订。' : 'Please log in to see your bookings.'}</p>`;
     return;
   }
   const { data, error } = await sb.from('orders').select('*').eq('customer_id', currentCustomer.id).order('created_at', {ascending:false});
@@ -814,7 +831,7 @@ async function loadMyBookings(){
     const statusKey = 'status' + o.status.charAt(0).toUpperCase() + o.status.slice(1);
     card.innerHTML = `<div class="top-row"><span class="ref">${o.ref}</span><span class="status-chip status-${o.status}">${I18N[currentLang][statusKey]||o.status}</span></div>
       <div class="meta">${o.locker_size||'—'}/${o.temp_mode||'—'} · ${o.dropoff_date||'?'} → ${o.pickup_date||'?'}</div>`;
-    card.onclick = ()=>{ document.getElementById('trackInput').value = o.ref; trackOrder(); document.getElementById('track-result').scrollIntoView({behavior:'smooth'}); };
+    card.onclick = ()=>{ displayTrackedOrder(o); document.getElementById('track-result').scrollIntoView({behavior:'smooth'}); };
     listEl.appendChild(card);
   });
 }
@@ -823,11 +840,19 @@ async function loadMyBookings(){
 async function loadWallet(){
   const listEl = document.getElementById('walletList');
   if(!currentCustomer || !currentCustomer.id){
-    listEl.innerHTML = `<p style="font-size:12px; opacity:0.65;">${currentLang==='zh' ? '登录后即可查看您的账单记录。':"Your billing history will appear here once linked to your account."}</p>`;
+    listEl.innerHTML = `<p style="font-size:12px; opacity:0.65;">${currentLang==='zh' ? '请先登录以查看您的钱包。':'Please log in to see your wallet.'}</p>`;
     document.getElementById('walletTotalPaid').textContent = "฿0";
     document.getElementById('walletTotalPending').textContent = "฿0";
+    document.getElementById('walletBalanceAmount').textContent = "฿0";
+    document.getElementById('walletPoints').textContent = "0";
     return;
   }
+  const { data: wallet } = await sb.rpc('customer_get_wallet_info', { p_customer_id: currentCustomer.id });
+  if(wallet && wallet.length){
+    document.getElementById('walletBalanceAmount').textContent = displayAmount(wallet[0].wallet_balance);
+    document.getElementById('walletPoints').textContent = wallet[0].loyalty_points;
+  }
+
   const { data, error } = await sb.from('orders').select('*').eq('customer_id', currentCustomer.id).order('created_at', {ascending:false});
   if(error){ listEl.innerHTML = "Error: " + error.message; return; }
   let paidTotal = 0, pendingTotal = 0;
@@ -845,6 +870,42 @@ async function loadWallet(){
   document.getElementById('walletTotalPaid').textContent = "฿" + paidTotal;
   document.getElementById('walletTotalPending').textContent = "฿" + pendingTotal;
   if(!data || data.length===0){ listEl.innerHTML = `<p style="font-size:12px; opacity:0.65;">${currentLang==='zh' ? '暂无记录。':'No transactions yet.'}</p>`; }
+}
+
+/* ---------- wallet top-up (customer requests amount, pays via QR, staff confirms) ---------- */
+async function requestTopup(evt){
+  const amount = parseFloat(document.getElementById('topupAmount').value);
+  if(!currentCustomer || !currentCustomer.id){ alert(currentLang==='zh' ? '请先登录。' : 'Please log in first.'); return; }
+  if(!amount || amount <= 0){ alert(currentLang==='zh' ? '请输入有效金额。' : 'Please enter a valid amount.'); return; }
+  const btnEl = evt ? evt.target : null;
+  if(btnEl){ btnEl.disabled = true; btnEl.style.opacity = 0.6; }
+  const { data: ref, error } = await sb.rpc('customer_create_topup', { p_customer_id: currentCustomer.id, p_amount: amount });
+  if(btnEl){ btnEl.disabled = false; btnEl.style.opacity = 1; }
+  if(error){ alert("Error: " + error.message); return; }
+  window._pendingTopup = { ref, amount };
+  document.getElementById('topupRefDisplay').value = ref;
+  document.getElementById('topupPayBox').classList.remove('hide');
+  document.getElementById('topupPayMsg').textContent = "";
+}
+async function confirmTopupPayment(evt){
+  const ref = document.getElementById('topupRefDisplay').value.trim();
+  const msgEl = document.getElementById('topupPayMsg');
+  const btnEl = evt ? evt.target : null;
+  if(btnEl){ btnEl.disabled = true; btnEl.style.opacity = 0.6; }
+  const { error } = await sb.rpc('customer_claim_topup', { p_ref: ref });
+  if(btnEl){ btnEl.disabled = false; btnEl.style.opacity = 1; }
+  if(error){ msgEl.textContent = "Error: " + error.message; msgEl.style.color = "#E88"; return; }
+  msgEl.textContent = I18N[currentLang].payMarkedOk; msgEl.style.color = "#8FD9A8";
+  const b = window._pendingTopup;
+  if(b){
+    const L = currentLang === 'zh';
+    let msg = (L ? "钱包充值（客户声明已付款，待核实）：\n" : "Wallet top-up (customer claims PAID — please verify):\n");
+    msg += (L ? "编号：" : "Ref: ") + b.ref + "\n";
+    msg += (L ? "金额：" : "Amount: ") + "฿" + b.amount + "\n";
+    msg += (L ? "客户：" : "Customer: ") + (currentCustomer.first_name||"") + " " + (currentCustomer.last_name||"") + "\n";
+    msg += (L ? "联系方式：" : "Contact: ") + (currentCustomer.phone||"");
+    window.open("https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(msg), "_blank");
+  }
 }
 
 /* ---------- step navigation ---------- */
@@ -921,6 +982,24 @@ async function loadSettings(){
 }
 function sizeRate(size){ if(!SETTINGS) return 0; return { S: SETTINGS.size_s_rate, M: SETTINGS.size_m_rate, L: SETTINGS.size_l_rate, XL: SETTINGS.size_xl_rate }[size] || 0; }
 function tempAddon(temp){ if(!SETTINGS) return 0; return { normal: 0, cold: SETTINGS.temp_cold_addon, frozen: SETTINGS.temp_frozen_addon }[temp] || 0; }
+
+/* ---------- multi-currency display (THB is always the real charged amount; this is just an equivalent shown to the customer) ---------- */
+let currentCurrency = 'THB';
+const CURRENCY_SYMBOLS = { THB:'฿', MYR:'RM', SGD:'S$', CNY:'¥' };
+function setCurrency(code){
+  currentCurrency = code;
+  renderPaymentSummary();
+  loadWallet();
+}
+function displayAmount(thbAmount){
+  if(currentCurrency === 'THB' || !SETTINGS){ return "฿" + Math.round(thbAmount); }
+  const bankRate = { MYR: SETTINGS.rate_myr_bank, SGD: SETTINGS.rate_sgd_bank, CNY: SETTINGS.rate_cny_bank }[currentCurrency];
+  if(!bankRate) return "฿" + Math.round(thbAmount);
+  const margin = (SETTINGS.fx_margin_percent || 5) / 100;
+  const effectiveRate = bankRate * (1 + margin);
+  const converted = thbAmount / effectiveRate;
+  return CURRENCY_SYMBOLS[currentCurrency] + converted.toFixed(2) + " (฿" + Math.round(thbAmount) + ")";
+}
 function selectSize(size){ selectedSize = size; document.querySelectorAll('.size-opt').forEach(el=>el.classList.toggle('selected', el.dataset.size===size)); }
 function selectTemp(temp){ selectedTemp = temp; document.querySelectorAll('.temp-opt[data-temp]').forEach(el=>el.classList.toggle('selected', el.dataset.temp===temp)); }
 function selectDelivery(opt){
@@ -976,11 +1055,11 @@ function renderPaymentSummary(){
   const fs = selectedDelivery === 'full_service' ? fullServiceFee() : 0;
   if(selectedDelivery === 'full_service'){
     fsRow.classList.remove('hide');
-    document.getElementById('sumFsFee').textContent = "฿" + fs;
+    document.getElementById('sumFsFee').textContent = displayAmount(fs);
   } else {
     fsRow.classList.add('hide');
   }
-  document.getElementById('sumTotal').textContent = "฿" + (rate*days + fs);
+  document.getElementById('sumTotal').textContent = displayAmount(rate*days + fs);
 }
 document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('dropoffDate').addEventListener('change', ()=>{});
@@ -1079,42 +1158,6 @@ async function confirmInlinePayment(evt){
 }
 
 /* ---------- track ---------- */
-async function trackOrder(){
-  const query = document.getElementById('trackInput').value.trim();
-  const msgEl = document.getElementById('trackMsg');
-  const resultEl = document.getElementById('track-result');
-  const multiEl = document.getElementById('track-multi');
-  multiEl.classList.add('hide'); multiEl.innerHTML = "";
-  if(!query){ msgEl.textContent = I18N[currentLang].trackEmpty; resultEl.classList.add('hide'); return; }
-  msgEl.textContent = "…";
-
-  // 1) Try as an exact reference number first
-  const { data: byRef } = await sb.from('orders').select('*').eq('ref', query.toUpperCase()).maybeSingle();
-  if(byRef){ msgEl.textContent = ""; displayTrackedOrder(byRef); return; }
-
-  // 2) Fall back to searching by recipient name (works even without logging in)
-  const { data: byName, error } = await sb.from('orders').select('*').ilike('recipient', '%'+query+'%').order('created_at', {ascending:false});
-  if(error || !byName || byName.length===0){ msgEl.textContent = I18N[currentLang].trackNotFound; resultEl.classList.add('hide'); return; }
-
-  if(byName.length === 1){ msgEl.textContent = ""; displayTrackedOrder(byName[0]); return; }
-
-  // Multiple bookings match this name — let the customer pick one
-  msgEl.textContent = "";
-  resultEl.classList.add('hide');
-  const title = document.createElement('div');
-  title.style.cssText = "font-size:12px; font-weight:600; margin-bottom:8px; color:var(--ink);";
-  title.textContent = I18N[currentLang].multiMatchTitle;
-  multiEl.appendChild(title);
-  byName.forEach(o=>{
-    const card = document.createElement('div');
-    card.className = 'match-card';
-    card.innerHTML = `<div class="ref">${o.ref}</div><div class="meta">${o.recipient} · ${o.dropoff_date||'?'} → ${o.pickup_date||'?'} · ${o.status}</div>`;
-    card.onclick = ()=>{ multiEl.classList.add('hide'); displayTrackedOrder(o); };
-    multiEl.appendChild(card);
-  });
-  multiEl.classList.remove('hide');
-}
-
 function displayTrackedOrder(order){
   const resultEl = document.getElementById('track-result');
   document.getElementById('t-ref').textContent = order.ref;
@@ -1160,7 +1203,9 @@ async function releaseLocker(){
   const { data, error } = await sb.rpc('customer_release_locker', { p_ref: ref, p_access_code: code });
   if(error || !data){ msgEl.textContent = I18N[currentLang].releaseErr; msgEl.style.color = "var(--stamp)"; return; }
   msgEl.textContent = I18N[currentLang].releaseOk; msgEl.style.color = "#8FD9A8";
-  trackOrder();
+  const { data: refreshed } = await sb.from('orders').select('*').eq('ref', ref).maybeSingle();
+  if(refreshed) displayTrackedOrder(refreshed);
+  loadMyBookings();
 }
 
 /* ---------- admin ---------- */
