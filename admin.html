@@ -192,8 +192,10 @@
   .admin-form-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
   .admin-form-row input, .admin-form-row select{ flex:1; min-width:70px; padding:10px; border-radius:7px; border:none; font-size:13px; }
   .admin-form-row button{ background:linear-gradient(180deg,#c24537,var(--stamp)); color:#fff; border:none; padding:10px 16px; border-radius:7px; font-weight:700; cursor:pointer; font-size:13px; box-shadow:var(--sh-sm);}
-  table{ width:100%; border-collapse:collapse; font-size:13px;}
-  th, td{ text-align:left; padding:8px 6px; border-bottom:1px solid rgba(228,217,190,0.15);}
+  table{ width:100%; border-collapse:separate; border-spacing:0 10px; font-size:13px;}
+  th, td{ text-align:left; padding:12px 8px; }
+  .customer-group-body table tr{ background:#2E1010; }
+  .customer-group-body table tr:not(:first-child) td{ padding-top:14px; padding-bottom:14px; }
   th{ color:var(--mustard); font-size:11px; letter-spacing:0.05em; text-transform:uppercase;}
   .del-btn{ background:none; border:none; color:#E88; cursor:pointer; font-size:12px; font-weight:700;}
   .lbl-inline{ font-size:11px; opacity:0.6; display:block; margin-bottom:3px; }
@@ -229,13 +231,19 @@
 
 <div id="admin-view" class="hide">
   <div class="admin-wrap">
-    <div class="admin-header"><h2>SHOP ADMIN</h2><button class="back-btn" onclick="logoutAdmin()">Log Out</button></div>
+    <div class="admin-header"><h2>SHOP ADMIN</h2>
+      <div style="display:flex; gap:6px;">
+        <button class="back-btn" onclick="refreshCurrentTab()">🔄 Refresh</button>
+        <button class="back-btn" onclick="logoutAdmin()">Log Out</button>
+      </div>
+    </div>
 
     <div class="admin-tabs">
       <button id="atab-bookings" class="active" onclick="showAdminTab('bookings')">📋 Bookings</button>
       <button id="atab-promotions" onclick="showAdminTab('promotions')">🏷️ Promotions</button>
       <button id="atab-rates" onclick="showAdminTab('rates')">💱 Rates</button>
       <button id="atab-lockers" onclick="showAdminTab('lockers')">🔒 Lockers &amp; PIN</button>
+      <button id="atab-dashboard" onclick="showAdminTab('dashboard')">🖥️ Dashboard</button>
     </div>
 
     <!-- ===== TAB: BOOKINGS (grouped by customer) ===== -->
@@ -324,6 +332,32 @@
         <div id="pinChangeMsg" style="font-size:12px; min-height:16px;"></div>
       </div>
     </div>
+
+    <!-- ===== TAB: DASHBOARD (controls the customer-facing website) ===== -->
+    <div id="admintab-dashboard" class="hide">
+      <div class="admin-card">
+        <h3>Home Page — Promo Slides</h3>
+        <p style="font-size:11px; opacity:0.65; margin-bottom:10px;">Upload one image per slide. Toggle a slide off if you're not using it — it won't show on the customer site.</p>
+        <div id="promoSlidesEditor"></div>
+      </div>
+
+      <div class="admin-card">
+        <h3>My Rewards Page — Reward Slides</h3>
+        <p style="font-size:11px; opacity:0.65; margin-bottom:10px;">Show off redeemable rewards/products here. Same upload-and-toggle system as above.</p>
+        <div id="rewardSlidesEditor"></div>
+      </div>
+
+      <div class="admin-card">
+        <h3>Branches &amp; Google Maps Links</h3>
+        <div id="branchesEditor"></div>
+        <div class="admin-form-row" style="margin-top:10px;">
+          <input type="text" id="newBranchName" placeholder="New branch name">
+          <input type="text" id="newBranchMap" placeholder="Google Maps link (optional)">
+          <button onclick="addBranch()" style="grid-column:span 2;">+ Add Branch</button>
+        </div>
+        <div id="addBranchMsg" style="font-size:12px; min-height:16px;"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -334,12 +368,33 @@ const SUPABASE_URL = "https://cimippgrdbaspqomimhf.supabase.co";
 const SUPABASE_KEY = "sb_publishable_OYST4lqvXzJEmABg6uknAA_BPzDP6RY";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let ADMIN_SESSION_PIN = null;
+const ADMIN_SESSION_KEY = 'grabngo_admin_session';
 
 document.addEventListener('DOMContentLoaded', ()=>{
   const pinInput = document.getElementById('pinInput');
   pinInput.addEventListener('keydown', e=>{ if(e.key==='Enter') checkPin(); });
   pinInput.focus();
+  restoreAdminSession();
 });
+
+async function restoreAdminSession(){
+  let saved = null;
+  try{ saved = localStorage.getItem(ADMIN_SESSION_KEY); }catch(e){}
+  if(!saved) return;
+  const { data, error } = await sb.rpc('admin_verify', { pin: saved });
+  if(error || !data) return;
+  enterAdminApp(saved);
+}
+function enterAdminApp(pin){
+  ADMIN_SESSION_PIN = pin;
+  try{ localStorage.setItem(ADMIN_SESSION_KEY, pin); }catch(e){}
+  document.getElementById('login-screen').classList.add('hide');
+  document.getElementById('admin-view').classList.remove('hide');
+  showAdminTab('bookings');
+  document.getElementById('bookingDateFilter').value = new Date().toISOString().slice(0,10);
+  refreshCurrentTab();
+  renderPromoTable(); renderCustomersOrdersList(); loadSettingsIntoAdminForm(); loadBranches(); loadDashboardSlides();
+}
 
 async function checkPin(){
   const val = document.getElementById('pinInput').value.trim();
@@ -347,25 +402,31 @@ async function checkPin(){
   errEl.textContent = "Checking\u2026";
   const { data, error } = await sb.rpc('admin_verify', { pin: val });
   if(error || !data){ errEl.textContent = "Incorrect PIN."; return; }
-  ADMIN_SESSION_PIN = val; errEl.textContent = "";
-  document.getElementById('login-screen').classList.add('hide');
-  document.getElementById('admin-view').classList.remove('hide');
-  showAdminTab('bookings');
-  document.getElementById('bookingDateFilter').value = new Date().toISOString().slice(0,10);
-  renderPromoTable(); renderCustomersOrdersList(); loadSettingsIntoAdminForm(); loadBranches();
+  errEl.textContent = "";
+  enterAdminApp(val);
 }
+let CURRENT_ADMIN_TAB = 'bookings';
 function clearDateFilter(){
   document.getElementById('bookingDateFilter').value = "";
   renderCustomersOrdersList();
 }
 function showAdminTab(tab){
-  ['bookings','promotions','rates','lockers'].forEach(t=>{
+  CURRENT_ADMIN_TAB = tab;
+  ['bookings','promotions','rates','lockers','dashboard'].forEach(t=>{
     document.getElementById('admintab-'+t).classList.toggle('hide', t!==tab);
     document.getElementById('atab-'+t).classList.toggle('active', t===tab);
   });
 }
+function refreshCurrentTab(){
+  if(CURRENT_ADMIN_TAB==='bookings') renderCustomersOrdersList();
+  else if(CURRENT_ADMIN_TAB==='promotions') renderPromoTable();
+  else if(CURRENT_ADMIN_TAB==='rates') loadSettingsIntoAdminForm();
+  else if(CURRENT_ADMIN_TAB==='lockers'){ loadBranches(); }
+  else if(CURRENT_ADMIN_TAB==='dashboard') loadDashboardSlides();
+}
 function logoutAdmin(){
   ADMIN_SESSION_PIN = null;
+  try{ localStorage.removeItem(ADMIN_SESSION_KEY); }catch(e){}
   document.getElementById('admin-view').classList.add('hide');
   document.getElementById('login-screen').classList.remove('hide');
   document.getElementById('pinInput').value = "";
@@ -473,6 +534,92 @@ async function loadBranches(){
   const sel = document.getElementById('branchSelect');
   sel.innerHTML = data.map(b=>`<option value="${b.id}">${b.name}</option>`).join('');
   if(data.length){ CURRENT_BRANCH_ID = data[0].id; loadLockersForBranch(); }
+}
+
+/* ---------- Dashboard: promo slides, reward slides, branches ---------- */
+async function loadDashboardSlides(){
+  const [{ data: promo }, { data: reward }, { data: branches }] = await Promise.all([
+    sb.from('promo_slides').select('*').order('id'),
+    sb.from('reward_slides').select('*').order('id'),
+    sb.from('branches').select('*').order('created_at')
+  ]);
+  renderSlideEditor('promoSlidesEditor', promo||[], 'promo');
+  renderSlideEditor('rewardSlidesEditor', reward||[], 'reward');
+  renderBranchesEditor(branches||[]);
+}
+function renderSlideEditor(containerId, slides, kind){
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+  slides.forEach(s=>{
+    const card = document.createElement('div');
+    card.className = 'locker-detail-card';
+    card.innerHTML = `
+      <div class="locker-detail-head"><b>Slide ${s.id}</b>
+        <label style="margin-left:auto; display:flex; align-items:center; gap:6px; font-size:11px;">
+          <input type="checkbox" id="${kind}-active-${s.id}" ${s.active?'checked':''} onchange="toggleSlide('${kind}', ${s.id}, this.checked)"> Active
+        </label>
+      </div>
+      <div class="locker-detail-body">
+        ${s.image_url ? `<img src="${s.image_url}" style="max-width:100%; max-height:100px; border-radius:6px; margin-bottom:6px; display:block;">` : '<span style="opacity:0.6;">No image uploaded yet</span>'}
+        <input type="file" accept="image/*" id="${kind}-file-${s.id}" style="margin-top:6px;">
+        <button style="margin-top:6px;" onclick="uploadSlideImage('${kind}', ${s.id})">Upload</button>
+        <div id="${kind}-msg-${s.id}" style="font-size:11px; margin-top:4px;"></div>
+      </div>`;
+    container.appendChild(card);
+  });
+}
+async function uploadSlideImage(kind, id){
+  const fileInput = document.getElementById(`${kind}-file-${id}`);
+  const file = fileInput.files[0];
+  const msgEl = document.getElementById(`${kind}-msg-${id}`);
+  if(!file){ msgEl.textContent = "Choose a file first."; msgEl.style.color = "#E88"; return; }
+  const path = kind + "-slide-" + id + "-" + Date.now() + "-" + file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+  const { error: upErr } = await sb.storage.from('product-photos').upload(path, file);
+  if(upErr){ msgEl.textContent = "Error: " + upErr.message; msgEl.style.color = "#E88"; return; }
+  const url = sb.storage.from('product-photos').getPublicUrl(path).data.publicUrl;
+  const rpcName = kind === 'promo' ? 'admin_update_promo_slide' : 'admin_update_reward_slide';
+  const activeEl = document.getElementById(`${kind}-active-${id}`);
+  const { error } = await sb.rpc(rpcName, { pin: ADMIN_SESSION_PIN, p_id: id, p_image_url: url, p_active: activeEl ? activeEl.checked : true });
+  if(error){ msgEl.textContent = "Error: " + error.message; msgEl.style.color = "#E88"; return; }
+  msgEl.textContent = "Uploaded!"; msgEl.style.color = "#8FD9A8";
+  loadDashboardSlides();
+}
+async function toggleSlide(kind, id, active){
+  const rpcName = kind === 'promo' ? 'admin_update_promo_slide' : 'admin_update_reward_slide';
+  const { data: current } = await sb.from(kind === 'promo' ? 'promo_slides' : 'reward_slides').select('image_url').eq('id', id).maybeSingle();
+  await sb.rpc(rpcName, { pin: ADMIN_SESSION_PIN, p_id: id, p_image_url: current ? current.image_url : null, p_active: active });
+}
+function renderBranchesEditor(branches){
+  const container = document.getElementById('branchesEditor');
+  container.innerHTML = "";
+  branches.forEach(b=>{
+    const row = document.createElement('div');
+    row.className = 'admin-form-row';
+    row.innerHTML = `
+      <input type="text" id="branch-name-${b.id}" value="${b.name}">
+      <input type="text" id="branch-map-${b.id}" value="${b.map_link||''}" placeholder="Google Maps link">
+      <button onclick="saveBranch('${b.id}')" style="grid-column:span 2;">Save</button>
+    `;
+    container.appendChild(row);
+  });
+}
+async function saveBranch(id){
+  const name = document.getElementById('branch-name-'+id).value.trim();
+  const map = document.getElementById('branch-map-'+id).value.trim();
+  const { error } = await sb.rpc('admin_update_branch', { pin: ADMIN_SESSION_PIN, p_id: id, p_name: name, p_map_link: map || null });
+  if(error){ alert("Error: " + error.message); return; }
+  loadDashboardSlides(); loadBranches();
+}
+async function addBranch(){
+  const name = document.getElementById('newBranchName').value.trim();
+  const map = document.getElementById('newBranchMap').value.trim();
+  const msgEl = document.getElementById('addBranchMsg');
+  if(!name){ msgEl.textContent = "Enter a branch name."; msgEl.style.color = "#E88"; return; }
+  const { error } = await sb.rpc('admin_add_branch', { pin: ADMIN_SESSION_PIN, p_name: name, p_map_link: map || null });
+  if(error){ msgEl.textContent = "Error: " + error.message; msgEl.style.color = "#E88"; return; }
+  msgEl.textContent = "Branch added."; msgEl.style.color = "#8FD9A8";
+  document.getElementById('newBranchName').value = ""; document.getElementById('newBranchMap').value = "";
+  loadDashboardSlides(); loadBranches();
 }
 async function loadLockersForBranch(){
   const sel = document.getElementById('branchSelect');
