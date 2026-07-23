@@ -203,8 +203,8 @@
   .item-total-line{ text-align:right; font-family:'Space Mono',monospace; font-size:13px; font-weight:700; color:var(--ink); margin-top:8px; padding-top:6px; border-top:1px dashed rgba(139,30,30,0.2); }
   #lockerLoader{ position:fixed; inset:0; background:rgba(28,10,10,0.85); z-index:999; display:none; align-items:center; justify-content:center; }
   #lockerLoader.show{ display:flex; }
-  #lockerLoader.anim #loaderDoor{ animation:doorSwing 0.5s ease-in-out; }
-  #lockerLoader.anim #loaderBox{ animation:boxPop 0.5s ease-in-out; }
+  #lockerLoader.anim #loaderDoor{ animation:doorSwing 0.8s ease-in-out; }
+  #lockerLoader.anim #loaderBox{ animation:boxPop 0.8s ease-in-out; }
   @keyframes doorSwing{ 0%{transform:rotateY(0deg);} 40%{transform:rotateY(-70deg);} 60%{transform:rotateY(-70deg);} 100%{transform:rotateY(0deg);} }
   @keyframes boxPop{ 0%{opacity:0;} 40%{opacity:0;} 50%{opacity:1;} 100%{opacity:1;} }
   .slip-upload-label{ display:block; font-size:11px; font-weight:600; opacity:0.75; margin-top:10px; margin-bottom:4px; }
@@ -304,13 +304,7 @@
   </div>
   <div class="wrap">
     <div class="carousel">
-      <div class="carousel-track" id="carouselTrack">
-        <div class="carousel-slide" style="background:linear-gradient(135deg,#8B1E1E,#D32F2F);">Promo Slide 1</div>
-        <div class="carousel-slide" style="background:linear-gradient(135deg,#B23A2E,#E8746A);">Promo Slide 2</div>
-        <div class="carousel-slide" style="background:linear-gradient(135deg,#6b1414,#A93226);">Promo Slide 3</div>
-        <div class="carousel-slide" style="background:linear-gradient(135deg,#8B1E1E,#c0392b);">Promo Slide 4</div>
-        <div class="carousel-slide" style="background:linear-gradient(135deg,#5a1010,#8B1E1E);">Promo Slide 5</div>
-      </div>
+      <div class="carousel-track" id="carouselTrack"></div>
       <button class="carousel-arrow left" onclick="carouselMove(-1)">‹</button>
       <button class="carousel-arrow right" onclick="carouselMove(1)">›</button>
       <div class="carousel-dots" id="carouselDots"></div>
@@ -523,6 +517,10 @@
     <div id="tab-content-bookings" class="hide">
       <div class="step-label" data-i18n="myBookingsLabel">MY BOOKINGS</div>
       <h2 class="step-title" data-i18n="myBookingsTitle">Your Bookings</h2>
+      <div class="track-form" style="margin-bottom:6px;">
+        <input type="text" id="myBookingsSearch" data-i18n-ph="myBookingsSearchPh" placeholder="Search by reference number" oninput="renderMyBookingsList()">
+        <button onclick="toggleMyBookingsViewAll()" id="myBookingsViewAllBtn" data-i18n="viewAllBtn">View All</button>
+      </div>
       <div id="myBookingsList"><p style="font-size:12px; opacity:0.6;">Loading…</p></div>
     </div>
 
@@ -537,18 +535,13 @@
         <div class="wallet-points-row" data-i18n="walletEarnRateNote">Earn 10 points for every ฿100 you spend</div>
       </div>
 
-      <div class="summary-card" style="margin-top:14px; text-align:center;">
-        <h4 data-i18n="walletRedeemLabel">REDEEM YOUR POINTS</h4>
-        <p style="font-size:12.5px; opacity:0.85; margin-bottom:14px;" data-i18n="walletRedeemText">Message us on WhatsApp to redeem your points for a discount code or a small gift.</p>
-        <a class="btn dark" id="walletRedeemWaBtn" href="#" target="_blank" data-i18n="walletRedeemBtn">💬 Redeem via WhatsApp</a>
+      <div class="carousel" id="rewardCarousel" style="margin-top:16px;">
+        <div class="carousel-track" id="rewardCarouselTrack"></div>
+        <button class="carousel-arrow left" onclick="rewardCarouselMove(-1)">‹</button>
+        <button class="carousel-arrow right" onclick="rewardCarouselMove(1)">›</button>
+        <div class="carousel-dots" id="rewardCarouselDots"></div>
       </div>
-
-      <div class="summary-card">
-        <h4 data-i18n="walletHistoryLabel">TRANSACTION HISTORY</h4>
-        <div class="summary-row"><span data-i18n="walletTotalPaid">Total paid (bookings)</span><span class="v" id="walletTotalPaid">฿0</span></div>
-        <div class="summary-row"><span data-i18n="walletTotalPending">Awaiting payment</span><span class="v" id="walletTotalPending">฿0</span></div>
-      </div>
-      <div id="walletList"><p style="font-size:12px; opacity:0.6;">Loading…</p></div>
+      <a class="btn dark" id="walletRedeemWaBtn" href="#" target="_blank" style="margin-top:12px;" data-i18n="walletRedeemBtn">💬 Redeem via WhatsApp</a>
     </div>
 
     <!-- ===== CONTACT ADMIN ===== -->
@@ -654,6 +647,8 @@ const I18N = {
     payVerifying:"VERIFYING PAYMENT (5–10 MIN)", payConfirmed:"✓ Confirmed",
     trackEyebrow:"TRACK YOUR BOOKING", trackTitle:"Enter Your Reference Number",
     trackHint:"Looking up a booking for someone else? Search by reference number or name below.",
+    myBookingsSearchPh:"Search by reference number", viewAllBtn:"View All", viewRecentBtn:"View Recent",
+    rBranch:"Branch", mapLinkBtn:"📍 View on Google Maps",
     navSearch:"Search Items", navBookings:"My Bookings", navWallet:"My Reward", navContact:"Contact Admin",
     carouselNote:"Shop promotions and updates will appear here.",
     homeWelcome:"Welcome back!", homeWelcomeSub:"Use the buttons below to get started.",
@@ -739,6 +734,8 @@ const I18N = {
     payVerifying:"กำลังตรวจสอบการชำระเงิน (5-10 นาที)", payConfirmed:"✓ ยืนยันแล้ว",
     trackEyebrow:"ติดตามการจองของคุณ", trackTitle:"กรอกเลขอ้างอิง",
     trackHint:"ต้องการค้นหาการจองของคนอื่นใช่ไหม? ค้นหาด้วยเลขอ้างอิงหรือชื่อด้านล่าง",
+    myBookingsSearchPh:"ค้นหาด้วยเลขอ้างอิง", viewAllBtn:"ดูทั้งหมด", viewRecentBtn:"ดูล่าสุด",
+    rBranch:"สาขา", mapLinkBtn:"📍 ดูใน Google Maps",
     navSearch:"ค้นหาสินค้า", navBookings:"การจองของฉัน", navWallet:"รางวัลของฉัน", navContact:"ติดต่อแอดมิน",
     carouselNote:"โปรโมชั่นและข่าวสารของร้านจะแสดงที่นี่",
     homeWelcome:"ยินดีต้อนรับกลับ!", homeWelcomeSub:"ใช้ปุ่มด้านล่างเพื่อเริ่มต้นใช้งาน",
@@ -823,6 +820,8 @@ const I18N = {
     payVerifying:"核实付款中（5-10分钟）", payConfirmed:"✓ 已确认",
     trackEyebrow:"追踪您的预订", trackTitle:"输入您的编号",
     trackHint:"要查询别人的预订吗？请在下方用编号或姓名搜索。",
+    myBookingsSearchPh:"按编号搜索", viewAllBtn:"查看全部", viewRecentBtn:"查看最近",
+    rBranch:"分店", mapLinkBtn:"📍 在 Google 地图查看",
     navSearch:"搜索商品", navBookings:"我的预订", navWallet:"我的奖励", navContact:"联系客服",
     carouselNote:"店铺优惠及最新消息将显示于此。",
     homeWelcome:"欢迎回来！", homeWelcomeSub:"请使用下方按钮开始使用。",
@@ -957,31 +956,72 @@ function showLockerLoader(){
   if(!el) return;
   el.classList.remove('anim'); void el.offsetWidth;
   el.classList.add('show','anim');
-  setTimeout(()=>{ el.classList.remove('show','anim'); }, 500);
+  setTimeout(()=>{ el.classList.remove('show','anim'); }, 800);
 }
 
 /* ---------- home ad carousel ---------- */
 let carouselIndex = 0;
 let carouselTimer = null;
-function initCarousel(){
+async function initCarousel(){
+  const { data } = await sb.from('promo_slides').select('*').eq('active', true).not('image_url','is',null).order('id');
   const track = document.getElementById('carouselTrack');
-  const slideCount = track.children.length;
   const dotsEl = document.getElementById('carouselDots');
+  if(!data || data.length===0){
+    track.innerHTML = `<div class="carousel-slide" style="background:linear-gradient(135deg,#8B1E1E,#D32F2F);">GrabNGo</div>`;
+    dotsEl.innerHTML = "";
+    return;
+  }
+  track.innerHTML = data.map(s=>`<div class="carousel-slide" style="background-image:url('${s.image_url}'); background-size:cover; background-position:center;"></div>`).join('');
   dotsEl.innerHTML = "";
-  for(let i=0;i<slideCount;i++){
+  data.forEach((s,i)=>{
     const d = document.createElement('div');
     d.className = 'dot2' + (i===0 ? ' active' : '');
     dotsEl.appendChild(d);
-  }
+  });
+  carouselIndex = 0;
   clearInterval(carouselTimer);
-  carouselTimer = setInterval(()=>carouselMove(1), 4000);
+  if(data.length > 1){ carouselTimer = setInterval(()=>carouselMove(1), 4000); }
 }
 function carouselMove(dir){
   const track = document.getElementById('carouselTrack');
   const slideCount = track.children.length;
+  if(slideCount===0) return;
   carouselIndex = (carouselIndex + dir + slideCount) % slideCount;
   track.style.transform = "translateX(-" + (carouselIndex*100) + "%)";
   document.querySelectorAll('#carouselDots .dot2').forEach((d,i)=>d.classList.toggle('active', i===carouselIndex));
+}
+
+let rewardCarouselIndex = 0;
+let rewardCarouselTimer = null;
+async function initRewardCarousel(){
+  const { data } = await sb.from('reward_slides').select('*').eq('active', true).not('image_url','is',null).order('id');
+  const track = document.getElementById('rewardCarouselTrack');
+  const dotsEl = document.getElementById('rewardCarouselDots');
+  if(!track) return;
+  if(!data || data.length===0){
+    track.innerHTML = `<div class="carousel-slide" style="background:linear-gradient(135deg,#8B1E1E,#D32F2F); font-size:13px; text-align:center; padding:0 20px;">${currentLang==='zh'?'即将推出兑换奖励':currentLang==='th'?'ของรางวัลเร็วๆ นี้':'Rewards coming soon'}</div>`;
+    dotsEl.innerHTML = "";
+    return;
+  }
+  track.innerHTML = data.map(s=>`<div class="carousel-slide" style="background-image:url('${s.image_url}'); background-size:cover; background-position:center;"></div>`).join('');
+  dotsEl.innerHTML = "";
+  data.forEach((s,i)=>{
+    const d = document.createElement('div');
+    d.className = 'dot2' + (i===0 ? ' active' : '');
+    dotsEl.appendChild(d);
+  });
+  rewardCarouselIndex = 0;
+  clearInterval(rewardCarouselTimer);
+  if(data.length > 1){ rewardCarouselTimer = setInterval(()=>rewardCarouselMove(1), 4000); }
+}
+function rewardCarouselMove(dir){
+  const track = document.getElementById('rewardCarouselTrack');
+  if(!track) return;
+  const slideCount = track.children.length;
+  if(slideCount===0) return;
+  rewardCarouselIndex = (rewardCarouselIndex + dir + slideCount) % slideCount;
+  track.style.transform = "translateX(-" + (rewardCarouselIndex*100) + "%)";
+  document.querySelectorAll('#rewardCarouselDots .dot2').forEach((d,i)=>d.classList.toggle('active', i===rewardCarouselIndex));
 }
 
 /* ---------- my bookings (auto-list for the logged-in customer) ---------- */
@@ -995,6 +1035,7 @@ function getDisplayStatus(o){
   return { label: I18N[currentLang][key] || o.status, cls:'status-'+o.status };
 }
 
+let myBookingsViewAll = false;
 async function loadMyBookings(){
   const listEl = document.getElementById('myBookingsList');
   if(!currentCustomer || !currentCustomer.id){
@@ -1015,8 +1056,30 @@ async function loadMyBookings(){
   window._myItemsMap = {};
   (myItems||[]).forEach(it=>{ (window._myItemsMap[it.order_ref] = window._myItemsMap[it.order_ref] || []).push(it); });
 
+  const { data: myBranches } = await sb.from('branches').select('*');
+  window._myBranchesMap = {};
+  (myBranches||[]).forEach(b=>{ window._myBranchesMap[b.id] = b; });
+
+  renderMyBookingsList();
+}
+function toggleMyBookingsViewAll(){
+  myBookingsViewAll = !myBookingsViewAll;
+  document.getElementById('myBookingsViewAllBtn').textContent = myBookingsViewAll ? I18N[currentLang].viewRecentBtn : I18N[currentLang].viewAllBtn;
+  renderMyBookingsList();
+}
+function renderMyBookingsList(){
+  const listEl = document.getElementById('myBookingsList');
+  const data = window._myBookingsData || [];
+  const searchVal = (document.getElementById('myBookingsSearch').value || '').trim().toUpperCase();
+
+  let shown = data;
+  if(searchVal){ shown = data.filter(o => o.ref.toUpperCase().includes(searchVal)); }
+  else if(!myBookingsViewAll){ shown = data.slice(0, 5); }
+
   listEl.innerHTML = "";
-  data.forEach(o=>{
+  if(shown.length === 0){ listEl.innerHTML = `<p style="font-size:12px; opacity:0.65;">${currentLang==='zh' ? '未找到相符的预订。':'No matching bookings found.'}</p>`; return; }
+
+  shown.forEach(o=>{
     const wrap = document.createElement('div');
     wrap.className = 'booking-card-wrap';
     const ds = getDisplayStatus(o);
@@ -1057,8 +1120,17 @@ function buildBookingDetailHTML(o){
       <div class="receipt-row"><span class="k" data-i18n="rSize">Size / Mode</span><span class="v">${o.locker_size||'—'} / ${o.temp_mode||'—'}</span></div>
       <div class="receipt-row"><span class="k" data-i18n="rDropoff">Drop-off</span><span class="v">${o.dropoff_date||'—'}</span></div>
       <div class="receipt-row"><span class="k" data-i18n="rPickup">Pickup</span><span class="v">${o.pickup_date||'—'}</span></div>
-      <div class="receipt-row"><span class="k" data-i18n="rPaid">Paid</span><span class="v">${o.booking_paid ? '✓' : '✗'}</span></div>
-      ${items.length ? `<div class="receipt-items-section"><div class="receipt-items-title" data-i18n="rItemsTitle">ITEMS REQUESTED</div>${itemsHtml}</div>` : ''}`;
+      <div class="receipt-row"><span class="k" data-i18n="rPaid">Paid</span><span class="v">${o.booking_paid ? '✓' : '✗'}</span></div>`;
+
+  const branch = o.branch_id && window._myBranchesMap ? window._myBranchesMap[o.branch_id] : null;
+  if(o.booking_paid && branch){
+    html += `<div class="receipt-row"><span class="k" data-i18n="rBranch">Branch</span><span class="v">${branch.name}</span></div>`;
+    if(branch.map_link){
+      html += `<a href="${branch.map_link}" target="_blank" onclick="event.stopPropagation();" class="btn outline small" style="margin-top:8px; display:block; text-align:center;" data-i18n="mapLinkBtn">📍 View on Google Maps</a>`;
+    }
+  }
+
+  html += `${items.length ? `<div class="receipt-items-section"><div class="receipt-items-title" data-i18n="rItemsTitle">ITEMS REQUESTED</div>${itemsHtml}</div>` : ''}`;
 
   if(o.status === 'stored' && o.locker_id){
     const expired = o.code_expires_at && new Date(o.code_expires_at) < new Date();
@@ -1175,12 +1247,9 @@ async function claimExtraCharge(chargeId, ref){
 
 /* ---------- my wallet (billing summary) ---------- */
 async function loadWallet(){
-  const listEl = document.getElementById('walletList');
   if(!currentCustomer || !currentCustomer.id){
-    listEl.innerHTML = `<p style="font-size:12px; opacity:0.65;">${currentLang==='zh' ? '请先登录以查看您的积分。':'Please log in to see your points.'}</p>`;
-    document.getElementById('walletTotalPaid').textContent = "฿0";
-    document.getElementById('walletTotalPending').textContent = "฿0";
     document.getElementById('walletPoints').textContent = "0";
+    initRewardCarousel();
     return;
   }
   const { data: wallet } = await sb.rpc('customer_get_wallet_info', { p_customer_id: currentCustomer.id });
@@ -1190,24 +1259,7 @@ async function loadWallet(){
   document.getElementById('walletRedeemWaBtn').href = "https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(
     (L ? "您好，我想用我的积分兑换优惠或礼物。我目前有 " : "Hi, I'd like to redeem my points for a discount or gift. I currently have ") + points + (L ? " 分。" : " points.")
   );
-
-  const { data, error } = await sb.from('orders').select('*').eq('customer_id', currentCustomer.id).order('created_at', {ascending:false});
-  if(error){ listEl.innerHTML = "Error: " + error.message; return; }
-  let paidTotal = 0, pendingTotal = 0;
-  listEl.innerHTML = "";
-  (data||[]).forEach(o=>{
-    const days = (o.dropoff_date && o.pickup_date) ? Math.max(1, Math.round((new Date(o.pickup_date)-new Date(o.dropoff_date))/86400000)) : 1;
-    const fee = (o.daily_rate||0)*days + (o.full_service_fee||0);
-    if(o.booking_paid){ paidTotal += fee; } else { pendingTotal += fee; }
-    const row = document.createElement('div');
-    row.className = 'booking-card';
-    row.innerHTML = `<div class="top-row"><span class="ref">${o.ref}</span><span class="v mono" style="font-weight:700;">฿${fee}</span></div>
-      <div class="meta">${o.booking_paid ? (currentLang==='zh'?'已付款':'Paid') : (currentLang==='zh'?'待付款':'Unpaid')} · ${o.dropoff_date||'?'}</div>`;
-    listEl.appendChild(row);
-  });
-  document.getElementById('walletTotalPaid').textContent = "฿" + paidTotal;
-  document.getElementById('walletTotalPending').textContent = "฿" + pendingTotal;
-  if(!data || data.length===0){ listEl.innerHTML = `<p style="font-size:12px; opacity:0.65;">${currentLang==='zh' ? '暂无记录。':'No transactions yet.'}</p>`; }
+  initRewardCarousel();
 }
 
 /* ---------- step navigation ---------- */
