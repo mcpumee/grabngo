@@ -19,7 +19,6 @@
   html{scroll-behavior:smooth;}
   body{
     background:var(--paper);
-    background-image: repeating-linear-gradient(180deg, rgba(139,30,30,0.035) 0px, rgba(139,30,30,0.035) 2px, transparent 2px, transparent 22px);
     color:var(--charcoal); font-family:'Work Sans','Noto Sans SC',sans-serif; line-height:1.5; font-size:15px; padding-bottom:20px;
   }
   /* Locker-door vent strip — a reusable decorative top edge for cards, like a locker's ventilation slats */
@@ -52,6 +51,7 @@
   .field input, .field textarea, .field select{ width:100%; padding:11px 13px; border-radius:8px; border:1.5px solid var(--ink); font-family:inherit; font-size:14px; background:var(--paper-light); color:var(--charcoal); box-shadow:var(--sh-inset); transition:box-shadow 0.15s ease, border-color 0.15s ease; }
   .field input:focus, .field textarea:focus, .field select:focus{ outline:none; border-color:var(--mustard); box-shadow:var(--sh-inset), 0 0 0 3px rgba(214,164,65,0.25); }
   .field input[type=file]{ padding:9px; font-size:12.5px; box-shadow:none; }
+  .field input[type=date]{ padding:9px 6px; font-size:12.5px; }
 
   .btn{ position:relative; overflow:hidden; display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; background:linear-gradient(180deg, #e0453f, var(--stamp)); color:#fff; border:none; padding:15px 20px; border-radius:12px; font-weight:700; font-size:15px; cursor:pointer; box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.3); transition:transform 0.15s cubic-bezier(.34,1.56,.64,1), box-shadow 0.15s ease; }
   .btn::after{ content:""; position:absolute; top:0; left:-60%; width:40%; height:100%; background:linear-gradient(120deg, transparent, rgba(255,255,255,0.35), transparent); transform:skewX(-20deg); transition:left 0.5s ease; }
@@ -121,11 +121,16 @@
   .add-item-btn{ width:100%; padding:12px; border:2px dashed var(--ink); border-radius:10px; background:none; font-weight:700; font-size:13px; color:var(--ink); cursor:pointer; margin-bottom:16px;}
 
   .size-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-bottom:6px; }
-  .size-opt{ position:relative; border:1.5px solid var(--ink); border-radius:6px; padding:14px 4px 10px; text-align:center; cursor:pointer; background:var(--paper-light); background-image:repeating-linear-gradient(180deg, rgba(28,20,20,0.06) 0px, rgba(28,20,20,0.06) 1px, transparent 1px, transparent 6px); box-shadow:var(--sh-sm); transition:transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.15s ease; }
+  .size-opt{ position:relative; border:1.5px solid var(--ink); border-radius:6px; padding:14px 4px 10px; text-align:center; cursor:pointer; background:var(--paper-light); background-image:repeating-linear-gradient(180deg, rgba(28,20,20,0.06) 0px, rgba(28,20,20,0.06) 1px, transparent 1px, transparent 6px); box-shadow:var(--sh-sm); transition:transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s ease; }
   .size-opt::before{ content:""; position:absolute; top:5px; right:6px; width:4px; height:9px; border-radius:2px; background:var(--ink); opacity:0.6; }
+  .size-opt::after{ content:"✓"; position:absolute; top:-7px; left:50%; transform:translateX(-50%) scale(0); width:18px; height:18px; border-radius:50%; background:var(--stamp); color:#fff; font-size:11px; line-height:18px; font-weight:700; box-shadow:0 2px 6px rgba(0,0,0,0.3); transition:transform 0.3s cubic-bezier(.34,1.9,.64,1); }
+  .size-opt:hover{ transform:rotate(-1.5deg) translateY(-1px); }
   .size-opt:active{ transform:scale(0.94); }
-  .size-opt.selected{ background-color:var(--mustard); background-image:repeating-linear-gradient(180deg, rgba(28,20,20,0.1) 0px, rgba(28,20,20,0.1) 1px, transparent 1px, transparent 6px); box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.35); transform:translateY(-2px) scale(1.04); }
+  .size-opt.selected{ background-color:var(--mustard); background-image:repeating-linear-gradient(180deg, rgba(28,20,20,0.1) 0px, rgba(28,20,20,0.1) 1px, transparent 1px, transparent 6px); box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.35), 0 0 0 3px rgba(214,164,65,0.35); transform:translateY(-2px) scale(1.04); animation:sizePop 0.35s cubic-bezier(.34,1.56,.64,1); }
+  .size-opt.selected::after{ content:"✓"; position:absolute; top:-7px; left:-7px; width:18px; height:18px; border-radius:50%; background:var(--stamp); color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.3); }
+  @keyframes sizePop{ 0%{ transform:translateY(-2px) scale(1); } 50%{ transform:translateY(-4px) scale(1.12) rotate(-2deg); } 100%{ transform:translateY(-2px) scale(1.04); } }
   .size-opt.selected::before{ background:var(--ink); opacity:0.85; }
+  .size-opt.selected::after{ transform:translateX(-50%) scale(1); }
   .size-opt strong{ display:block; font-size:13px; color:var(--ink); }
   .size-opt .r{ font-family:'Space Mono',monospace; font-size:10px; color:var(--ink); opacity:0.75; margin-top:2px;}
   .temp-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-bottom:6px; }
@@ -134,7 +139,8 @@
   .temp-opt.selected{ background:linear-gradient(180deg,#3a8079,var(--teal)); color:#fff; box-shadow:var(--sh-md), inset 0 1px 0 rgba(255,255,255,0.25); transform:translateY(-2px) scale(1.04); }
   .temp-opt strong{ display:block; font-size:11px; }
   .temp-opt .r{ font-family:'Space Mono',monospace; font-size:9px; opacity:0.8; margin-top:2px;}
-  .field-row{ display:flex; gap:10px; }
+  .field-row{ display:flex; gap:12px; }
+  .field-row input[type="date"]{ padding:10px 8px; font-size:12.5px; }
   .field-row .field{ flex:1; }
 
   .summary-card{ background:linear-gradient(165deg,var(--ink-light),var(--ink)); color:var(--paper); border-radius:12px; padding:16px; margin-bottom:14px; box-shadow:var(--sh-md);}
@@ -193,6 +199,14 @@
   .access-code-box .code{ font-family:'Space Mono',monospace; font-size:24px; letter-spacing:0.15em; font-weight:700; }
   .access-code-box .lbl{ font-size:10px; color:var(--paper); opacity:0.7; letter-spacing:0.08em; }
   .secret-code-note{ margin-top:12px; text-align:center; font-size:11.5px; color:var(--stamp); font-weight:600; background:var(--paper-dark); border-radius:8px; padding:8px 10px; }
+  .price-change-note{ font-size:11.5px; opacity:0.75; background:var(--paper-light); border:1px dashed var(--ink); border-radius:8px; padding:8px 10px; margin-bottom:12px; }
+  .item-total-line{ text-align:right; font-family:'Space Mono',monospace; font-size:13px; font-weight:700; color:var(--ink); margin-top:8px; padding-top:6px; border-top:1px dashed rgba(139,30,30,0.2); }
+  #lockerLoader{ position:fixed; inset:0; background:rgba(28,10,10,0.85); z-index:999; display:none; align-items:center; justify-content:center; }
+  #lockerLoader.show{ display:flex; }
+  #lockerLoader.anim #loaderDoor{ animation:doorSwing 0.5s ease-in-out; }
+  #lockerLoader.anim #loaderBox{ animation:boxPop 0.5s ease-in-out; }
+  @keyframes doorSwing{ 0%{transform:rotateY(0deg);} 40%{transform:rotateY(-70deg);} 60%{transform:rotateY(-70deg);} 100%{transform:rotateY(0deg);} }
+  @keyframes boxPop{ 0%{opacity:0;} 40%{opacity:0;} 50%{opacity:1;} 100%{opacity:1;} }
   .slip-upload-label{ display:block; font-size:11px; font-weight:600; opacity:0.75; margin-top:10px; margin-bottom:4px; }
   .receipt-items-section{ margin-top:10px; padding-top:8px; border-top:1.5px dashed var(--ink); }
   .receipt-items-title{ font-size:10.5px; letter-spacing:0.08em; font-weight:700; color:var(--stamp); margin-bottom:6px; }
@@ -219,9 +233,9 @@
   .bottom-nav svg{ width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
   body{ padding-bottom:70px; }
 
-  .carousel{ position:relative; border-radius:14px; overflow:hidden; box-shadow:var(--sh-md); }
-  .carousel-track{ display:flex; transition:transform 0.4s ease; }
-  .carousel-slide{ flex:0 0 100%; height:110px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:14px; letter-spacing:0.03em; }
+  .carousel{ position:relative; border-radius:14px; overflow:hidden; box-shadow:var(--sh-md); margin-top:28px; aspect-ratio:16/9; }
+  .carousel-track{ display:flex; transition:transform 0.4s ease; height:100%; }
+  .carousel-slide{ flex:0 0 100%; height:100%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:16px; letter-spacing:0.03em; }
   .carousel-arrow{ position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.85); border:none; width:28px; height:28px; border-radius:50%; font-size:16px; color:var(--ink); cursor:pointer; box-shadow:var(--sh-sm); }
   .carousel-arrow.left{ left:8px; } .carousel-arrow.right{ right:8px; }
   .carousel-dots{ position:absolute; bottom:8px; left:0; right:0; display:flex; justify-content:center; gap:6px; }
@@ -266,6 +280,17 @@
 </style>
 </head>
 <body>
+
+
+<div id="lockerLoader">
+  <svg viewBox="0 0 100 100" width="70" height="70">
+    <rect x="20" y="15" width="60" height="70" rx="6" fill="none" stroke="#fff" stroke-width="4"/>
+    <rect id="loaderDoor" x="20" y="15" width="60" height="70" rx="6" fill="#8B1E1E" stroke="#fff" stroke-width="4" style="transform-origin:20px 50px;"/>
+    <circle id="loaderHandle" cx="68" cy="50" r="4" fill="#fff"/>
+    <rect id="loaderBox" x="42" y="55" width="16" height="16" rx="2" fill="#D6A441" opacity="0"/>
+  </svg>
+</div>
+
 
 <!-- ===================== AUTH VIEW ===================== -->
 <div id="auth-view">
@@ -384,6 +409,7 @@
       <div id="step-1">
         <div class="step-label" data-i18n="step1Label">STEP 1 — SEARCH ITEMS</div>
         <h2 class="step-title" data-i18n="step1Title">What Do You Want?</h2>
+        <p class="price-change-note" data-i18n="priceChangeNote">Note: if the actual product price differs from what you entered, we'll let you know and either refund the difference or bill you the extra amount.</p>
         <div id="itemsContainer"></div>
         <button class="add-item-btn" onclick="addItemRow()" data-i18n="addItemBtn">+ Add Another Item</button>
         <button class="btn dark" onclick="goToStep(2)" data-i18n="nextStep2">Next: Choose Locker →</button>
@@ -456,9 +482,6 @@
           <div class="summary-row total"><span data-i18n="sumTotal">Total due now</span><span class="v" id="sumTotal">฿0</span></div>
         </div>
 
-        <div class="field"><label data-i18n="lblRecipient">Your name (for the locker)</label><input type="text" id="reqRecipient"></div>
-        <div class="field"><label data-i18n="lblContact">WhatsApp number</label><input type="text" id="reqContact" data-i18n-ph="phContact" placeholder="+60..."></div>
-
         <div class="btn-nav-row">
           <button class="btn outline" onclick="goToStep(2)" data-i18n="back">← Back</button>
           <button class="btn dark" onclick="createBooking(event)" data-i18n="confirmBookBtn">Confirm Booking</button>
@@ -483,13 +506,14 @@
           <div class="summary-card" style="margin-top:14px;">
             <h4 data-i18n="payNowLabel">PAY NOW TO CONFIRM</h4>
             <p style="font-size:12.5px; opacity:0.85;" data-i18n="payNowText">Your booking is only confirmed once payment is verified by our staff.</p>
-            <div class="qr-box"><span>QR CODE</span></div>
-            <div style="display:flex; gap:8px;">
-              <input type="text" id="inlinePayRef" class="mono" readonly style="flex:1; padding:11px; border-radius:8px; border:none; font-size:13px;">
-              <button class="btn small dark" style="width:auto; padding:0 16px;" onclick="confirmInlinePayment(event)" data-i18n="markPaidBtn">I've Paid</button>
-            </div>
+            <div class="qr-box" id="inlineQrBox"><span>QR CODE</span></div>
+            <div id="inlineQrAmount" style="text-align:center; font-family:'Space Mono',monospace; font-weight:700; font-size:15px; margin-bottom:8px;"></div>
+            <button class="btn outline small" onclick="downloadQr('inlineQrBox','booking-qr')" data-i18n="downloadQrBtn">⬇ Download QR Code</button>
+            <input type="text" id="inlinePayRef" class="mono" readonly style="width:100%; padding:11px; border-radius:8px; border:none; font-size:13px; margin-top:10px;">
             <div class="pay-status-msg" id="inlinePayMsg"></div>
-            <p style="font-size:11px; opacity:0.7; margin-top:10px;" data-i18n="penaltyNote">Any late-pickup fee is settled when you collect your item.</p>
+            <p style="font-size:11px; opacity:0.7; margin:10px 0;" data-i18n="penaltyNote">Any late-pickup fee is settled when you collect your item.</p>
+            <input type="file" accept="image/*" id="inlineSlipFile" class="hide" onchange="confirmInlinePayment(event)">
+            <button class="btn dark" onclick="document.getElementById('inlineSlipFile').click()" data-i18n="markPaidBtn">I've Paid</button>
           </div>
         </div>
       </div>
@@ -587,6 +611,7 @@ const I18N = {
     footer:"GrabNGo · Locker booking & parcel service",
     logoutBtn:"Log Out", tabBook:"Book", tabTrack:"Track",
     step1Label:"STEP 1 — SEARCH ITEMS", step1Title:"What Do You Want?",
+    priceChangeNote:"Note: if the actual product price differs from what you entered, we'll let you know and either refund the difference or bill you the extra amount.",
     itemModeLink:"Link/Search", itemModePhoto:"Photo",
     lblLinkField:"Product link (optional)", lblPhotoField:"Or upload a photo (optional)", lblDescField:"Description",
     hintLinkField:"Paste a link from Shopee, Lazada, a store website, or anywhere else — whatever helps us find it.",
@@ -599,7 +624,7 @@ const I18N = {
     step2Label:"STEP 2 — CHOOSE YOUR LOCKER", step2Title:"Size & Storage Mode",
     lblSize:"Locker size", lblTemp:"Storage mode",
     lblDelivery:"How will the item reach us?",
-    deliverySelf:"I'll drop it off myself", deliverySelfNote:"Free",
+    deliverySelf:"I'll bring it myself (or my shop's staff will)", deliverySelfNote:"Free",
     deliveryFull:"Full Service — we pick it up",
     lblStoreName:"Store name", phStoreName:"e.g. ABC Electronics",
     lblStoreAddress:"Store address", phStoreAddress:"Address or map link",
@@ -643,7 +668,7 @@ const I18N = {
     contactWaBtn:"💬 Chat on WhatsApp",
     trackPh:"e.g. HHC-482913 or your name", trackBtn:"Track",
     saveReminderText:"Save this now — screenshot or download it so you don't lose your reference and code.",
-    downloadSlipBtn:"⬇ Download as Image",
+    downloadSlipBtn:"⬇ Download as Image", downloadQrBtn:"⬇ Download QR Code",
     multiMatchTitle:"Found several bookings — tap one to view it:",
     trackNotFound:"No booking found with that reference.", trackEmpty:"Please enter your reference number.",
     statusBooked:"BOOKED", statusPurchasing:"PURCHASING", statusIn_transit:"IN TRANSIT", statusWe_collected:"WE COLLECTED IT", statusStored:"PACKED & IN LOCKER", statusCollected:"COLLECTED",
@@ -671,6 +696,7 @@ const I18N = {
     footer:"GrabNGo · บริการจองล็อกเกอร์และรับพัสดุ",
     logoutBtn:"ออกจากระบบ", tabBook:"จอง", tabTrack:"ติดตาม",
     step1Label:"ขั้นตอนที่ 1 — ค้นหาสินค้า", step1Title:"คุณต้องการอะไร?",
+    priceChangeNote:"หมายเหตุ: หากราคาสินค้าจริงต่างจากที่กรอกไว้ ร้านจะแจ้งให้ทราบ และจะคืนเงินส่วนต่างหรือเรียกเก็บเพิ่มตามจริง",
     itemModeLink:"ลิงก์/ค้นหา", itemModePhoto:"รูปภาพ",
     lblLinkField:"ลิงก์สินค้า (ไม่บังคับ)", lblPhotoField:"หรืออัปโหลดรูป (ไม่บังคับ)", lblDescField:"รายละเอียด",
     hintLinkField:"วางลิงก์จาก Shopee, Lazada, เว็บร้านค้า หรือที่ไหนก็ได้ — ขอแค่ช่วยให้เราหาเจอ",
@@ -683,7 +709,7 @@ const I18N = {
     step2Label:"ขั้นตอนที่ 2 — เลือกล็อกเกอร์", step2Title:"ขนาดและโหมดจัดเก็บ",
     lblSize:"ขนาดล็อกเกอร์", lblTemp:"โหมดจัดเก็บ",
     lblDelivery:"สินค้าจะมาถึงเราอย่างไร?",
-    deliverySelf:"ฉันจะนำมาส่งเอง", deliverySelfNote:"ฟรี",
+    deliverySelf:"ฉันมาส่งเอง (หรือพนักงานร้านของฉันมาส่งแทน)", deliverySelfNote:"ฟรี",
     deliveryFull:"Full Service — ให้เราไปรับให้",
     lblStoreName:"ชื่อร้านค้า", phStoreName:"เช่น ABC Electronics",
     lblStoreAddress:"ที่อยู่ร้านค้า", phStoreAddress:"ที่อยู่หรือลิงก์แผนที่",
@@ -727,7 +753,7 @@ const I18N = {
     contactWaBtn:"💬 แชทผ่าน WhatsApp",
     trackPh:"เช่น HHC-482913 หรือชื่อของคุณ", trackBtn:"ติดตาม",
     saveReminderText:"บันทึกไว้ตอนนี้เลย — แคปหน้าจอหรือดาวน์โหลดเก็บไว้ กันลืมเลขอ้างอิงและรหัส",
-    downloadSlipBtn:"⬇ ดาวน์โหลดเป็นรูปภาพ",
+    downloadSlipBtn:"⬇ ดาวน์โหลดเป็นรูปภาพ", downloadQrBtn:"⬇ ดาวน์โหลด QR Code",
     multiMatchTitle:"พบการจองหลายรายการ — กดเพื่อดูรายละเอียด:",
     trackNotFound:"ไม่พบการจองด้วยเลขอ้างอิงนี้", trackEmpty:"กรุณากรอกเลขอ้างอิงของคุณ",
     statusBooked:"จองแล้ว", statusPurchasing:"กำลังซื้อ", statusIn_transit:"กำลังนำส่ง", statusWe_collected:"ร้านรับของแล้ว", statusStored:"แพคและเข้าล็อกเกอร์แล้ว", statusCollected:"รับของแล้ว",
@@ -754,6 +780,7 @@ const I18N = {
     footer:"GrabNGo · 寄存柜预订与包裹代收服务",
     logoutBtn:"登出", tabBook:"预订", tabTrack:"追踪",
     step1Label:"第一步 — 搜索商品", step1Title:"您想要什么？",
+    priceChangeNote:"提示：如果实际商品价格与您填写的不同，我们会通知您，并退还差额或补收差价。",
     itemModeLink:"链接/搜索", itemModePhoto:"照片",
     lblLinkField:"商品链接（可选）", lblPhotoField:"或上传照片（可选）", lblDescField:"描述",
     hintLinkField:"可以是 Shopee、Lazada、商店网站等任何链接——只要能帮我们找到商品即可。",
@@ -766,7 +793,7 @@ const I18N = {
     step2Label:"第二步 — 选择寄存柜", step2Title:"尺寸与存储模式",
     lblSize:"柜子尺寸", lblTemp:"存储模式",
     lblDelivery:"商品如何送达？",
-    deliverySelf:"我自行送来", deliverySelfNote:"免费",
+    deliverySelf:"我自己送来（或由我店铺的员工代送）", deliverySelfNote:"免费",
     deliveryFull:"全程服务 — 我们代为取货",
     lblStoreName:"店铺名称", phStoreName:"例如 ABC 电子",
     lblStoreAddress:"店铺地址", phStoreAddress:"地址或地图链接",
@@ -810,7 +837,7 @@ const I18N = {
     contactWaBtn:"💬 通过 WhatsApp 联系",
     trackPh:"例如 HHC-482913 或您的姓名", trackBtn:"追踪",
     saveReminderText:"请立即保存——截图或下载，以免遗失编号和密码。",
-    downloadSlipBtn:"⬇ 下载为图片",
+    downloadSlipBtn:"⬇ 下载为图片", downloadQrBtn:"⬇ 下载二维码",
     multiMatchTitle:"找到多笔预订——点选查看：",
     trackNotFound:"找不到该编号对应的预订。", trackEmpty:"请输入您的编号。",
     statusBooked:"已预订", statusPurchasing:"正在购买", statusIn_transit:"正在配送", statusWe_collected:"已代取", statusStored:"已打包入柜", statusCollected:"已领取",
@@ -901,8 +928,6 @@ function enterApp(){
   document.getElementById('auth-view').classList.add('hide');
   document.getElementById('booking-view').classList.remove('hide');
   document.getElementById('userGreeting').textContent = (currentCustomer.first_name||"") ;
-  document.getElementById('reqRecipient').value = ((currentCustomer.first_name||"")+" "+(currentCustomer.last_name||"")).trim();
-  document.getElementById('reqContact').value = currentCustomer.phone || "";
   document.getElementById('contactWaBtn').href = "https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent("Hi, I need help with my GrabNGo booking.");
   if(cartItems.length===0){ addItemRow(); }
   loadSettings();
@@ -915,6 +940,7 @@ function logout(){
   document.getElementById('auth-view').classList.remove('hide');
 }
 function showMainTab(tab){
+  showLockerLoader();
   ['search','bookings','wallet','contact'].forEach(t=>{
     document.getElementById('tab-content-'+t).classList.toggle('hide', t!==tab);
   });
@@ -925,6 +951,13 @@ function showMainTab(tab){
   if(tab==='bookings') loadMyBookings();
   if(tab==='wallet') loadWallet();
   window.scrollTo({top:0, behavior:'instant'});
+}
+function showLockerLoader(){
+  const el = document.getElementById('lockerLoader');
+  if(!el) return;
+  el.classList.remove('anim'); void el.offsetWidth;
+  el.classList.add('show','anim');
+  setTimeout(()=>{ el.classList.remove('show','anim'); }, 500);
 }
 
 /* ---------- home ad carousel ---------- */
@@ -1179,6 +1212,7 @@ async function loadWallet(){
 
 /* ---------- step navigation ---------- */
 function goToStep(n){
+  showLockerLoader();
   [1,2,3].forEach(i=>{
     document.getElementById('step-'+i).classList.toggle('hide', i!==n);
     document.getElementById('dot-'+i).classList.toggle('active', i===n);
@@ -1199,6 +1233,12 @@ function removeItemRow(id){
 }
 function updateItemField(id, field, value){
   const it = cartItems.find(i=>i.id===id); if(it){ it[field] = value; }
+  const totalEl = document.getElementById('itemTotal-'+id);
+  if(totalEl && it){
+    const qty = parseInt(it.qty)||1;
+    const price = parseFloat(it.estPrice);
+    totalEl.textContent = isNaN(price) ? '' : (qty + ' × ฿' + price.toFixed(2) + ' = ฿' + (qty*price).toFixed(2));
+  }
 }
 async function handleItemPhoto(id, file){
   if(!file) return;
@@ -1250,6 +1290,7 @@ function renderItemRows(){
           <input type="number" min="0" class="field-lg" placeholder="${I18N[currentLang].phEstPrice}" value="${it.estPrice||''}" oninput="updateItemField(${it.id},'estPrice',this.value)">
         </div>
       </div>
+      <div class="item-total-line" id="itemTotal-${it.id}">${it.estPrice ? (parseInt(it.qty)||1) + ' × ฿' + parseFloat(it.estPrice).toFixed(2) + ' = ฿' + ((parseInt(it.qty)||1)*parseFloat(it.estPrice)).toFixed(2) : ''}</div>
     `;
     container.appendChild(div);
   });
@@ -1362,9 +1403,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
 async function createBooking(evt){
   const dropoff = document.getElementById('dropoffDate').value;
   const pickup = document.getElementById('pickupDate').value;
-  const recipient = document.getElementById('reqRecipient').value.trim();
-  const contact = document.getElementById('reqContact').value.trim();
-  const hasItem = cartItems.some(it => it.query || it.imageUrl);
+  const recipient = ((currentCustomer.first_name||"")+" "+(currentCustomer.last_name||"")).trim();
+  const contact = currentCustomer.phone || "";
+  const hasItem = cartItems.some(it => it.query || it.imageUrl || (it.details && it.details.trim()));
   const missingPrice = cartItems.some(it => (it.query || it.imageUrl) && (it.estPrice === '' || it.estPrice === undefined || it.estPrice === null || isNaN(parseFloat(it.estPrice))));
 
   if(!hasItem || !dropoff || !pickup || !recipient || !contact){ alert(I18N[currentLang].bookAlert); return; }
@@ -1413,16 +1454,20 @@ async function createBooking(evt){
   document.getElementById('receipt-wrap').classList.remove('hide');
   document.getElementById('receipt-wrap').scrollIntoView({behavior:'smooth', block:'center'});
   document.getElementById('inlinePayRef').value = ref;
+  document.getElementById('inlineQrAmount').textContent = displayAmount(rate*days + fsFeeFinal);
 }
 
 /* ---------- pay-now (customer claims; staff verifies) ---------- */
 async function confirmInlinePayment(evt){
   const ref = document.getElementById('inlinePayRef').value.trim();
   const msgEl = document.getElementById('inlinePayMsg');
-  const btnEl = evt ? evt.target : null;
-  if(btnEl){ btnEl.disabled = true; btnEl.style.opacity = 0.6; }
-  const { error } = await sb.rpc('customer_claim_payment', { p_ref: ref });
-  if(btnEl){ btnEl.disabled = false; btnEl.style.opacity = 1; }
+  const fileInput = document.getElementById('inlineSlipFile');
+  const file = fileInput && fileInput.files[0];
+  if(!file){ msgEl.textContent = I18N[currentLang].payMarkedErr; msgEl.style.color = "#E88"; return; }
+
+  msgEl.textContent = "…"; msgEl.style.color = "";
+  const slipUrl = await uploadSlipIfAny('inlineSlipFile', 'slip-'+ref);
+  const { error } = await sb.rpc('customer_claim_payment', { p_ref: ref, p_slip_url: slipUrl });
   if(error){ msgEl.textContent = I18N[currentLang].payMarkedErr; msgEl.style.color = "#E88"; return; }
   msgEl.textContent = I18N[currentLang].payMarkedOk; msgEl.style.color = "#8FD9A8";
   document.querySelector('.status-chip.status-booked').textContent = I18N[currentLang].payVerifying;
@@ -1445,18 +1490,28 @@ async function confirmInlinePayment(evt){
     msg += (L ? "应付总额：" : "Amount due: ") + "฿" + b.total + "\n";
     msg += (L ? "姓名：" : "Name: ") + b.recipient + "\n";
     msg += (L ? "联系方式：" : "Contact: ") + b.contact;
+    if(slipUrl) msg += "\n" + (L ? "凭证：" : "Slip: ") + slipUrl;
     window.open("https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(msg), "_blank");
   }
 }
 
 /* ---------- track ---------- */
-/* ---------- download booking slip as an image (so customers don't lose their ref/code) ---------- */
+/* ---------- download booking slip / QR as an image ---------- */
 async function downloadSlip(elementId, prefix){
   const el = document.getElementById(elementId);
   if(!el || typeof html2canvas === 'undefined') return;
   const canvas = await html2canvas(el, { backgroundColor: '#FFFFFF', scale: 2 });
   const link = document.createElement('a');
   link.download = prefix + "-slip-" + Date.now() + ".png";
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+async function downloadQr(elementId, prefix){
+  const el = document.getElementById(elementId);
+  if(!el || typeof html2canvas === 'undefined') return;
+  const canvas = await html2canvas(el, { backgroundColor: '#FFFFFF', scale: 3 });
+  const link = document.createElement('a');
+  link.download = prefix + "-" + Date.now() + ".png";
   link.href = canvas.toDataURL('image/png');
   link.click();
 }
